@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import ReactApexChart from "react-apexcharts";
 
 class LineChart extends React.Component {
@@ -6,16 +6,18 @@ class LineChart extends React.Component {
     super(props);
 
     this.state = {
-      chartData: [],
-      chartOptions: {},
+      chartData: props.chartData,
+      chartOptions: props.chartOptions,
     };
   }
 
-  componentDidMount() {
-    this.setState({
-      chartData: this.props.chartData,
-      chartOptions: this.props.chartOptions,
-    });
+  componentDidUpdate(prevProps) {
+    if (prevProps.chartData !== this.props.chartData || prevProps.chartOptions !== this.props.chartOptions) {
+      this.setState({
+        chartData: this.props.chartData,
+        chartOptions: this.props.chartOptions,
+      });
+    }
   }
 
   render() {

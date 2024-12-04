@@ -1,3 +1,4 @@
+'use client'
 // Chakra imports
 import {
   Box,
@@ -10,18 +11,94 @@ import {
 // Custom components
 import Card from "components/card/Card.js";
 import LineChart from "components/charts/LineChart";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
 // Assets
 import { RiArrowUpSFill } from "react-icons/ri";
 import {
+  years,
   lineChartDataTotalSpent,
   lineChartOptionsTotalSpent,
+  lineChartDataTotalSpentCSV,
+  lineChartOptionsTotalSpentCSV,
 } from "variables/charts";
 
 export default function TotalSpent(props) {
   const { ...rest } = props;
+
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('Year');
+  const [chartData, setChartData] = useState(lineChartDataTotalSpentCSV);
+  const [chartOptions, setChartOptions] = useState(lineChartOptionsTotalSpentCSV);
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
+    setShowDropdown(false);
+  };
+
+  useEffect(() => {
+    const filterDataByYears = (yearsInterval) => {
+      const filteredYears = years.filter(year => year % yearsInterval === 0);
+      const filteredData = lineChartDataTotalSpentCSV.map(dataset => ({
+        ...dataset,
+        data: dataset.data.filter((_, index) => filteredYears.includes(years[index]))
+      }));
+      return { filteredData, filteredYears };
+    };
+
+    if (selectedOption === '5 Years') {
+      const { filteredData, filteredYears } = filterDataByYears(5);
+      setChartData(filteredData);
+      setChartOptions({
+        ...lineChartOptionsTotalSpentCSV,
+        xaxis: {
+          ...lineChartOptionsTotalSpentCSV.xaxis,
+          categories: filteredYears,
+        },
+      });
+    } else if (selectedOption === '10 Years') {
+      const { filteredData, filteredYears } = filterDataByYears(10);
+      setChartData(filteredData);
+      setChartOptions({
+        ...lineChartOptionsTotalSpentCSV,
+        xaxis: {
+          ...lineChartOptionsTotalSpentCSV.xaxis,
+          categories: filteredYears,
+        },
+      });
+    } else {
+      setChartData(lineChartDataTotalSpentCSV);
+      setChartOptions({
+        ...lineChartOptionsTotalSpentCSV,
+        xaxis: {
+          ...lineChartOptionsTotalSpentCSV.xaxis,
+          categories: years,
+        },
+      });
+    }
+  }, [selectedOption]);
+
+  // useEffect(() => {
+  //   const filterData = (interval) => {
+  //     return lineChartDataTotalSpentCSV.map(dataset => ({
+  //       ...dataset,
+  //       data: dataset.data.filter((_, index) => index % interval === 0)
+  //     }));
+  //   };
+
+  //   if (selectedOption === '5 Years') {
+  //     setChartData(filterData(5));
+  //   } else if (selectedOption === '10 Years') {
+  //     setChartData(filterData(10));
+  //   } else {
+  //     setChartData(lineChartDataTotalSpentCSV);
+  //   }
+  // }, [selectedOption]);
 
   // Chakra Color Mode
 
@@ -53,14 +130,43 @@ export default function TotalSpent(props) {
             fontSize='sm'
             fontWeight='500'
             color={textColorSecondary}
-            borderRadius='7px'>
+            borderRadius='7px'
+            onClick={toggleDropdown}>
             <Icon
               as={MdOutlineCalendarToday}
               color={textColorSecondary}
               me='4px'
             />
-            This month
+            {selectedOption}
           </Button>
+          {showDropdown && (
+            <Box
+              position='absolute'
+              mt='40px'
+              bg={boxBg}
+              borderRadius='7px'
+              boxShadow='md'
+              zIndex='1'>
+              <Button bg={boxBg}
+                      fontSize='sm'
+                      fontWeight='500'
+                      color={textColorSecondary}
+                      borderRadius='7px' 
+                      onClick={() => handleOptionClick('Year')}>Year</Button>
+              <Button bg={boxBg}
+                      fontSize='sm'
+                      fontWeight='500'
+                      color={textColorSecondary}
+                      borderRadius='7px' 
+                      onClick={() => handleOptionClick('5 Years')}>5 Years</Button>
+              <Button bg={boxBg}
+                      fontSize='sm'
+                      fontWeight='500'
+                      color={textColorSecondary}
+                      borderRadius='7px' 
+                      onClick={() => handleOptionClick('10 Years')}>10 Years</Button>
+            </Box>
+          )}
           <Button
             ms='auto'
             align='center'
@@ -86,7 +192,7 @@ export default function TotalSpent(props) {
             textAlign='start'
             fontWeight='700'
             lineHeight='100%'>
-            $37.5K
+            $16.5K
           </Text>
           <Flex align='center' mb='20px'>
             <Text
@@ -100,7 +206,7 @@ export default function TotalSpent(props) {
             <Flex align='center'>
               <Icon as={RiArrowUpSFill} color='green.500' me='2px' mt='2px' />
               <Text color='green.500' fontSize='sm' fontWeight='700'>
-                +2.45%
+                +13%
               </Text>
             </Flex>
           </Flex>
@@ -114,8 +220,8 @@ export default function TotalSpent(props) {
         </Flex>
         <Box minH='260px' minW='75%' mt='auto'>
           <LineChart
-            chartData={lineChartDataTotalSpent}
-            chartOptions={lineChartOptionsTotalSpent}
+            chartData={chartData}
+            chartOptions={chartOptions}
           />
         </Box>
       </Flex>

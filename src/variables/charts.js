@@ -1,4 +1,137 @@
+import * as d3 from 'd3';
+
 // Daily Traffic Dashboards Default
+
+// export const lineChartDataTotalSpentCSV = [
+//   {
+//     name: "Revenue",
+//     data: [50, 64, 48, 66, 49, 68],
+//   },
+//   {
+//     name: "Profit",
+//     data: [20, 30, 30, 50, 10, 20]
+//   }
+// ];
+
+// export const lineChartDataTotalSpentCSV = {
+//   data: [
+//     {x: 1920,y:50},
+//     {x: 1921,y:60},
+//     {x: 1922,y:70},
+//     {x: 1923,y:80},
+//     {x: 1924,y:90},
+//   ],
+// }
+
+export const lineChartDataTotalSpentCSV = [
+  {
+    name: "Revenue",
+    data: []
+  },
+  {
+    name: "Profit",
+    data: []
+  }
+];
+
+export let years = [];
+
+d3.csv('https://raw.githubusercontent.com/Duculet/testing/refs/heads/main/fortune500.csv').then((data) => {
+  const revenueData = data
+    .filter(d => d.Company === "General Motors")
+    .map(d => {
+      console.log(`Year: ${d.Year}, Revenue: ${d.Revenue}`);
+      years.push(+d.Year);
+      return +d.Revenue; // Convert to number
+    });
+
+  lineChartDataTotalSpentCSV[0].data = revenueData.slice(0, 50);
+  years = years.slice(0, 50)
+});
+
+d3.csv('https://raw.githubusercontent.com/Duculet/testing/refs/heads/main/fortune500.csv').then((data) => {
+  const profitData = data
+    .filter(d => d.Company === "General Motors")
+    .map(d => {
+      console.log(`Year: ${d.Year}, Profit: ${d.Revenue}`);
+      return +d.Profit; // Convert to number
+    });
+
+  lineChartDataTotalSpentCSV[1].data = profitData.slice(0, 50);
+});
+
+export const lineChartOptionsTotalSpentCSV = {
+  chart: {
+    toolbar: {
+      show: false,
+    },
+    dropShadow: {
+      enabled: true,
+      top: 13,
+      left: 0,
+      blur: 10,
+      opacity: 0.1,
+      color: "#4318FF",
+    },
+  },
+  colors: ["#4318FF", "#39B8FF"],
+  markers: {
+    size: 0,
+    colors: "white",
+    strokeColors: "#7551FF",
+    strokeWidth: 3,
+    strokeOpacity: 0.9,
+    strokeDashArray: 0,
+    fillOpacity: 1,
+    discrete: [],
+    shape: "circle",
+    radius: 2,
+    offsetX: 0,
+    offsetY: 0,
+    showNullDataPoints: true,
+  },
+  tooltip: {
+    theme: "dark",
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  stroke: {
+    curve: "smooth",
+    type: "line",
+  },
+  xaxis: {
+    type: "numeric",
+    categories: years,
+    labels: {
+      style: {
+        colors: "#A3AED0",
+        fontSize: "12px",
+        fontWeight: "500",
+      },
+    },
+    axisBorder: {
+      show: false,
+    },
+    axisTicks: {
+      show: false,
+    },
+  },
+  yaxis: {
+    show: false,
+  },
+  legend: {
+    show: false,
+  },
+  grid: {
+    show: false,
+    column: {
+      color: ["#7551FF", "#39B8FF"],
+      opacity: 0.5,
+    },
+  },
+  color: ["#7551FF", "#39B8FF"],
+};
 
 export const barChartDataDailyTraffic = [
   {
