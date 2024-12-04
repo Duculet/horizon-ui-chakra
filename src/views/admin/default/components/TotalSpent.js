@@ -130,7 +130,6 @@ export default function TotalSpent(props) {
           {showDropdown && (
             <Box
               position='absolute'
-              mt='40px'
               bg={boxBg}
               borderRadius='7px'
               boxShadow='md'
