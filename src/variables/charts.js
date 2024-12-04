@@ -109,6 +109,9 @@ export const lineChartOptionsTotalSpentCSV = {
         fontSize: "12px",
         fontWeight: "500",
       },
+      formatter: function (val) {
+        return Math.floor(val);
+      }
     },
     axisBorder: {
       show: false,
@@ -116,6 +119,7 @@ export const lineChartOptionsTotalSpentCSV = {
     axisTicks: {
       show: false,
     },
+    tickAmount: years.length, // Ensure all years are shown
   },
   yaxis: {
     show: false,

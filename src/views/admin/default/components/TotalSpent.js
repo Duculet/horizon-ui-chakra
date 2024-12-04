@@ -16,6 +16,7 @@ import { IoCheckmarkCircle } from "react-icons/io5";
 import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
 // Assets
 import { RiArrowUpSFill } from "react-icons/ri";
+import { char } from "stylis";
 import {
   years,
   lineChartDataTotalSpent,
@@ -34,6 +35,7 @@ export default function TotalSpent(props) {
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
+    console.log(years);
   };
 
   const handleOptionClick = (option) => {
@@ -59,6 +61,7 @@ export default function TotalSpent(props) {
         xaxis: {
           ...lineChartOptionsTotalSpentCSV.xaxis,
           categories: filteredYears,
+          tickAmount: filteredYears.length,
         },
       });
     } else if (selectedOption === '10 Years') {
@@ -69,6 +72,7 @@ export default function TotalSpent(props) {
         xaxis: {
           ...lineChartOptionsTotalSpentCSV.xaxis,
           categories: filteredYears,
+          tickAmount: filteredYears.length,
         },
       });
     } else {
@@ -78,27 +82,11 @@ export default function TotalSpent(props) {
         xaxis: {
           ...lineChartOptionsTotalSpentCSV.xaxis,
           categories: years,
+          tickAmount: years.length / 5,
         },
       });
     }
   }, [selectedOption]);
-
-  // useEffect(() => {
-  //   const filterData = (interval) => {
-  //     return lineChartDataTotalSpentCSV.map(dataset => ({
-  //       ...dataset,
-  //       data: dataset.data.filter((_, index) => index % interval === 0)
-  //     }));
-  //   };
-
-  //   if (selectedOption === '5 Years') {
-  //     setChartData(filterData(5));
-  //   } else if (selectedOption === '10 Years') {
-  //     setChartData(filterData(10));
-  //   } else {
-  //     setChartData(lineChartDataTotalSpentCSV);
-  //   }
-  // }, [selectedOption]);
 
   // Chakra Color Mode
 
@@ -192,7 +180,7 @@ export default function TotalSpent(props) {
             textAlign='start'
             fontWeight='700'
             lineHeight='100%'>
-            $16.5K
+            {Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1] / 1000)}k
           </Text>
           <Flex align='center' mb='20px'>
             <Text
@@ -201,7 +189,7 @@ export default function TotalSpent(props) {
               fontWeight='500'
               mt='4px'
               me='12px'>
-              Total Spent
+              Total Revenue
             </Text>
             <Flex align='center'>
               <Icon as={RiArrowUpSFill} color='green.500' me='2px' mt='2px' />
