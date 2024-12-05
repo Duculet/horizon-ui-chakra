@@ -12,7 +12,7 @@ import {
 import Card from "components/card/Card.js";
 import LineChart from "components/charts/LineChart";
 import React, { useState, useEffect } from "react";
-import { IoCheckmarkCircle } from "react-icons/io5";
+import { IoAlertCircle, IoCheckmarkCircle } from "react-icons/io5";
 import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
 // Assets
 import { RiArrowDownFill, RiArrowDownSFill, RiArrowUpSFill } from "react-icons/ri";
@@ -210,9 +210,9 @@ export default function TotalSpent(props) {
           </Flex>
 
           <Flex align='center'>
-            <Icon as={IoCheckmarkCircle} color='green.500' me='4px' />
-            <Text color='green.500' fontSize='md' fontWeight='700'>
-              On track
+            <Icon as={!green ? IoCheckmarkCircle : IoAlertCircle} color={!green ? 'green.500' : 'red.500'} me='4px' />
+            <Text color={!green ? 'green.500' : 'red.500'} fontSize='md' fontWeight='700'>
+              {!green ? 'On' : 'Off'} track
             </Text>
           </Flex>
         </Flex>
