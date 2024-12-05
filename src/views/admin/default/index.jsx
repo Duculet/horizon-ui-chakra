@@ -65,6 +65,7 @@ import {
   lineChartOptionsTotalSpentCSV,
   loadData
 } from "variables/charts";
+import { barChartDataConsumptionCSV } from "variables/charts";
 
 export default function UserReports() {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -97,7 +98,9 @@ export default function UserReports() {
           // value should be the last element of the array plus the letter 'k'
           value={
             dataLoaded ? (`$${Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1])}`
-          ) : ('Loading...')}
+          ) : (
+            'Loading...'
+          )}
         />
         <MiniStatistics
           startContent={
@@ -110,8 +113,12 @@ export default function UserReports() {
               }
             />
           }
-          name='Spend this month'
-          value='$642.39'
+          name='Costs'
+          value={
+            dataLoaded ? (`$${Math.floor(barChartDataConsumptionCSV[0].data[barChartDataConsumptionCSV[0].data.length - 1])}`
+          ) : (
+            'Loading...'
+          )}
         />
         <MiniStatistics growth='+23%' name='Sales' value='$574.34' />
         <MiniStatistics
