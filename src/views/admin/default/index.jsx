@@ -37,7 +37,7 @@ import Usa from "assets/img/dashboards/usa.png";
 import MiniCalendar from "components/calendar/MiniCalendar";
 import MiniStatistics from "components/card/MiniStatistics";
 import IconBox from "components/icons/IconBox";
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {
   MdAddTask,
   MdAttachMoney,
@@ -63,9 +63,16 @@ import {
   lineChartOptionsTotalSpent,
   lineChartDataTotalSpentCSV,
   lineChartOptionsTotalSpentCSV,
+  loadData
 } from "variables/charts";
 
 export default function UserReports() {
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  useEffect(() => {
+    loadData(setDataLoaded);
+  }, []);
+
   // Chakra Color Mode
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
@@ -88,7 +95,9 @@ export default function UserReports() {
           }
           name='Revenue'
           // value should be the last element of the array plus the letter 'k'
-          value={`$${Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1])}`}
+          value={
+            dataLoaded ? (`$${Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1])}`
+          ) : ('Loading...')}
         />
         <MiniStatistics
           startContent={
