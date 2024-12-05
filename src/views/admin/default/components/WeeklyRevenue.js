@@ -10,15 +10,23 @@ import {
 import Card from "components/card/Card.js";
 // Custom components
 import BarChart from "components/charts/BarChart";
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {
   barChartDataConsumption,
   barChartOptionsConsumption,
+  barChartDataConsumptionCSV,
+  barChartOptionsConsumptionCSV,
+  loadData
 } from "variables/charts";
 import { MdBarChart } from "react-icons/md";
 
 export default function WeeklyRevenue(props) {
   const { ...rest } = props;
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  useEffect(() => {
+    loadData(setDataLoaded);
+  }, []);
 
   // Chakra Color Mode
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -41,7 +49,7 @@ export default function WeeklyRevenue(props) {
           fontSize='xl'
           fontWeight='700'
           lineHeight='100%'>
-          Weekly Revenue
+          Yearly Revenue
         </Text>
         <Button
           align='center'
@@ -60,10 +68,15 @@ export default function WeeklyRevenue(props) {
       </Flex>
 
       <Box h='240px' mt='auto'>
-        <BarChart
-          chartData={barChartDataConsumption}
-          chartOptions={barChartOptionsConsumption}
-        />
+        
+        {dataLoaded ? (
+            <BarChart
+              chartData={barChartDataConsumptionCSV}
+              chartOptions={barChartOptionsConsumptionCSV}
+            />
+          ) : (
+            <Text>Loading...</Text>
+          )}
       </Box>
     </Card>
   );
