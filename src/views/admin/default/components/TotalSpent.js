@@ -15,7 +15,7 @@ import React, { useState, useEffect } from "react";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
 // Assets
-import { RiArrowUpSFill } from "react-icons/ri";
+import { RiArrowDownFill, RiArrowDownSFill, RiArrowUpSFill } from "react-icons/ri";
 import { char } from "stylis";
 import {
   years,
@@ -87,6 +87,17 @@ export default function TotalSpent(props) {
       });
     }
   }, [selectedOption]);
+
+  // Calculate percentage change for last year
+  const calculatePercentageChange = () => {
+    const revenueData = lineChartDataTotalSpentCSV[0].data;
+    if (revenueData.length < 2) return 0;
+    const lastValue = revenueData[revenueData.length - 1];
+    const secondToLastValue = revenueData[revenueData.length - 2];
+    const percentageChange = ((lastValue - secondToLastValue) / secondToLastValue) * 100;
+    return percentageChange.toFixed(2);
+  };
+  const green = (calculatePercentageChange > 0)
 
   // Chakra Color Mode
 
@@ -191,9 +202,9 @@ export default function TotalSpent(props) {
               Total Revenue
             </Text>
             <Flex align='center'>
-              <Icon as={RiArrowUpSFill} color='green.500' me='2px' mt='2px' />
-              <Text color='green.500' fontSize='sm' fontWeight='700'>
-                +13%
+              <Icon as={!green ? RiArrowUpSFill : RiArrowDownSFill} color={!green ? 'green.500' : 'red.500'} me='2px' mt='2px' />
+              <Text color={!green ? 'green.500' : 'red.500'} fontSize='sm' fontWeight='700'>
+                {calculatePercentageChange()}%
               </Text>
             </Flex>
           </Flex>
