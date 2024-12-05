@@ -57,6 +57,13 @@ import {
 } from "views/admin/default/variables/columnsData";
 import tableDataCheck from "views/admin/default/variables/tableDataCheck.json";
 import tableDataComplex from "views/admin/default/variables/tableDataComplex.json";
+import {
+  years,
+  lineChartDataTotalSpent,
+  lineChartOptionsTotalSpent,
+  lineChartDataTotalSpentCSV,
+  lineChartOptionsTotalSpentCSV,
+} from "variables/charts";
 
 export default function UserReports() {
   // Chakra Color Mode
@@ -79,8 +86,9 @@ export default function UserReports() {
               }
             />
           }
-          name='Earnings'
-          value='$350.4'
+          name='Revenue'
+          // value should be the last element of the array plus the letter 'k'
+          value={`$${Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1])}`}
         />
         <MiniStatistics
           startContent={

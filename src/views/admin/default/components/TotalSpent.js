@@ -15,7 +15,7 @@ import React, { useState, useEffect } from "react";
 import { IoAlertCircle, IoCheckmarkCircle } from "react-icons/io5";
 import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
 // Assets
-import { RiArrowDownFill, RiArrowDownSFill, RiArrowUpSFill } from "react-icons/ri";
+import { RiArrowDownSFill, RiArrowUpSFill } from "react-icons/ri";
 import { char } from "stylis";
 import {
   years,
@@ -23,6 +23,7 @@ import {
   lineChartOptionsTotalSpent,
   lineChartDataTotalSpentCSV,
   lineChartOptionsTotalSpentCSV,
+  loadData
 } from "variables/charts";
 
 export default function TotalSpent(props) {
@@ -32,6 +33,11 @@ export default function TotalSpent(props) {
   const [selectedOption, setSelectedOption] = useState('Year');
   const [chartData, setChartData] = useState(lineChartDataTotalSpentCSV);
   const [chartOptions, setChartOptions] = useState(lineChartOptionsTotalSpentCSV);
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  useEffect(() => {
+    loadData(setDataLoaded);
+  }, []);
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
@@ -217,10 +223,14 @@ export default function TotalSpent(props) {
           </Flex>
         </Flex>
         <Box minH='260px' minW='75%' mt='auto'>
-          <LineChart
-            chartData={chartData}
-            chartOptions={chartOptions}
-          />
+          {dataLoaded ? (
+            <LineChart
+              chartData={chartData}
+              chartOptions={chartOptions}
+            />
+          ) : (
+            <Text>Loading...</Text>
+          )}
         </Box>
       </Flex>
     </Card>

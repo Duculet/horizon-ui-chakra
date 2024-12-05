@@ -36,7 +36,11 @@ export const lineChartDataTotalSpentCSV = [
 
 export let years = [];
 
-d3.csv('https://raw.githubusercontent.com/Duculet/testing/refs/heads/main/fortune500.csv').then((data) => {
+
+// Loading data from CSV
+export const loadData = async (setDataLoaded) => {
+  const data = await d3.csv('https://raw.githubusercontent.com/Duculet/testing/refs/heads/main/fortune500.csv');
+
   const revenueData = data
     .filter(d => d.Company === "General Motors")
     .map(d => {
@@ -47,9 +51,7 @@ d3.csv('https://raw.githubusercontent.com/Duculet/testing/refs/heads/main/fortun
 
   lineChartDataTotalSpentCSV[0].data = revenueData.slice(0, 50);
   years = years.slice(0, 50)
-});
 
-d3.csv('https://raw.githubusercontent.com/Duculet/testing/refs/heads/main/fortune500.csv').then((data) => {
   const profitData = data
     .filter(d => d.Company === "General Motors")
     .map(d => {
@@ -58,7 +60,19 @@ d3.csv('https://raw.githubusercontent.com/Duculet/testing/refs/heads/main/fortun
     });
 
   lineChartDataTotalSpentCSV[1].data = profitData.slice(0, 50);
-});
+
+  const costsData = data
+    .filter(d => d.Company === "General Motors")
+    .map(d => {
+      console.log(`Year: ${d.Year}, Costs: ${d.Revenue - d.Profit}`);
+      return Math.floor(+d.Revenue - +d.Profit); // Convert to number
+    });
+
+  barChartDataConsumptionCSV[0].data = costsData.slice(0, 9);
+  barChartDataConsumptionCSV[1].data = profitData.slice(0, 9);
+
+  setDataLoaded(true);
+};
 
 export const lineChartOptionsTotalSpentCSV = {
   chart: {
@@ -236,6 +250,105 @@ export const barChartOptionsDailyTraffic = {
     bar: {
       borderRadius: 10,
       columnWidth: "40px",
+    },
+  },
+};
+
+export const barChartDataConsumptionCSV = [
+  {
+    name: "Cost",
+    data: [],
+  },
+  {
+    name: "Profit",
+    data: [],
+  },
+];
+
+export const barChartOptionsConsumptionCSV = {
+  chart: {
+    stacked: true,
+    toolbar: {
+      show: false,
+    },
+  },
+  tooltip: {
+    style: {
+      fontSize: "12px",
+      fontFamily: undefined,
+    },
+    onDatasetHover: {
+      style: {
+        fontSize: "12px",
+        fontFamily: undefined,
+      },
+    },
+    theme: "dark",
+  },
+  xaxis: {
+    categories: years.slice(0, 9),
+    show: false,
+    labels: {
+      show: true,
+      style: {
+        colors: "#A3AED0",
+        fontSize: "14px",
+        fontWeight: "500",
+      },
+    },
+    axisBorder: {
+      show: false,
+    },
+    axisTicks: {
+      show: false,
+    },
+  },
+  yaxis: {
+    show: false,
+    color: "black",
+    labels: {
+      show: false,
+      style: {
+        colors: "#A3AED0",
+        fontSize: "14px",
+        fontWeight: "500",
+      },
+    },
+  },
+
+  grid: {
+    borderColor: "rgba(163, 174, 208, 0.3)",
+    show: true,
+    yaxis: {
+      lines: {
+        show: false,
+        opacity: 0.5,
+      },
+    },
+    row: {
+      opacity: 0.5,
+    },
+    xaxis: {
+      lines: {
+        show: false,
+      },
+    },
+  },
+  fill: {
+    type: "solid",
+    colors: ["#5E37FF", "#6AD2FF", "#E1E9F8"],
+  },
+  legend: {
+    show: false,
+  },
+  colors: ["#5E37FF", "#6AD2FF", "#E1E9F8"],
+  dataLabels: {
+    enabled: false,
+  },
+  plotOptions: {
+    bar: {
+      borderRadius: 10,
+      columnWidth: "20px",
     },
   },
 };
