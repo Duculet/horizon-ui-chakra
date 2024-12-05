@@ -115,7 +115,7 @@ export default function UserReports() {
           }
           name='Costs'
           value={
-            dataLoaded ? (`$${Math.floor(barChartDataConsumptionCSV[0].data[barChartDataConsumptionCSV[0].data.length - 1])}`
+            dataLoaded ? (`$${Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1] - lineChartDataTotalSpentCSV[1].data[lineChartDataTotalSpentCSV[1].data.length - 1])}`
           ) : (
             'Loading...'
           )}
