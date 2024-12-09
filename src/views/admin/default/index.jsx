@@ -97,7 +97,31 @@ export default function UserReports() {
 
   useEffect(() => {
     loadData(setDataLoaded);
+
+    const savedComponents = localStorage.getItem('components');
+    if (savedComponents) {
+      const parsedComponents = JSON.parse(savedComponents);
+      setComponents(parsedComponents.map(component => ({
+        ...component,
+        content: getComponentById(component.id)
+      })));
+    }
   }, []);
+
+  const getComponentById = (id) => {
+    switch (id) {
+      case '1':
+        return <TotalRevenue />;
+      case '2':
+        return <TotalCosts />;
+      case '3':
+        return <TotalSpent />;
+      case '4':
+        return <WeeklyRevenue />;
+      default:
+        return null;
+    }
+  };
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
@@ -107,6 +131,9 @@ export default function UserReports() {
     items.splice(result.destination.index, 0, reorderedItem);
 
     setComponents(items);
+    localStorage.setItem('components', JSON.stringify(items.map(item => ({ id: item.id }))));
+    console.log(items);
+
   };
 
   return (
