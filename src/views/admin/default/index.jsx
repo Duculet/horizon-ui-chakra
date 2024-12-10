@@ -127,6 +127,7 @@ export default function UserReports() {
     <div>
       <Flex mb='20px' mt={{ base: '120px', md: '80px' }} gap='20px' alignItems='center' justifyContent='center'>
         <Button
+          backgroundColor={'white'}
           p={!isEditing ? '5px 30px' : '5px 50px'}
           onClick={() => setIsEditing(!isEditing)}
           leftIcon={<Icon as={MdEdit} />}
@@ -145,6 +146,8 @@ export default function UserReports() {
         />
         <Button
           p='5px 50px'
+          backgroundColor={'white'}
+          isDisabled={!isEditing}
           onClick={handleSaveOrder}
           leftIcon={<Icon as={MdSave} />}
         >
