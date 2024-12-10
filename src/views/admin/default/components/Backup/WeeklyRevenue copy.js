@@ -12,6 +12,8 @@ import Card from "components/card/Card.js";
 import BarChart from "components/charts/BarChart";
 import React, {useState, useEffect} from "react";
 import {
+  barChartDataConsumption,
+  barChartOptionsConsumption,
   barChartDataConsumptionCSV,
   barChartOptionsConsumptionCSV,
   loadData
@@ -47,7 +49,7 @@ export default function WeeklyRevenue(props) {
           fontSize='xl'
           fontWeight='700'
           lineHeight='100%'>
-          YTD Statistics
+          Yearly Revenue
         </Text>
         <Button
           align='center'

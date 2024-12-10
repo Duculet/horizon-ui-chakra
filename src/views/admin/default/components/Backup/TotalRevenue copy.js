@@ -32,7 +32,7 @@ const TotalRevenue = () => {
             name='Revenue'
             // value should be the last element of the array plus the letter 'k'
             value={
-                dataLoaded ? (`$${lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1]}m`
+                dataLoaded ? (`$${Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1])}`
             ) : (
                 'Loading...'
             )}

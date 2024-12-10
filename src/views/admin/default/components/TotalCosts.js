@@ -5,7 +5,7 @@ import MiniStatistics from 'components/card/MiniStatistics'
 import IconBox from 'components/icons/IconBox'
 import { loadData } from 'variables/charts'
 import { useState, useEffect } from 'react'
-import { lineChartDataTotalSpentCSV } from 'variables/charts'
+import { barChartDataConsumptionCSV } from 'variables/charts'
 import { Icon } from '@chakra-ui/react'
 
 const TotalCosts = () => {
@@ -16,7 +16,7 @@ const TotalCosts = () => {
     useEffect(() => {
         loadData(setDataLoaded);
     }, []);
-    
+
     return (
         <MiniStatistics
             startContent={
@@ -31,7 +31,7 @@ const TotalCosts = () => {
             }
             name='Costs'
             value={
-                dataLoaded ? (`$${Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1] - lineChartDataTotalSpentCSV[1].data[lineChartDataTotalSpentCSV[1].data.length - 1])}`
+                dataLoaded ? (`$${barChartDataConsumptionCSV[0].data[barChartDataConsumptionCSV[0].data.length - 1]}m`
             ) : (
                 'Loading...'
             )}

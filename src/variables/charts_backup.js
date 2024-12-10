@@ -2,48 +2,26 @@ import * as d3 from 'd3';
 
 // Daily Traffic Dashboards Default
 
-// URL to fetch CSV data
-const CSVURL = 'https://raw.githubusercontent.com/Duculet/testing/refs/heads/main/Tesla.csv';
+// export const lineChartDataTotalSpentCSV = [
+//   {
+//     name: "Revenue",
+//     data: [50, 64, 48, 66, 49, 68],
+//   },
+//   {
+//     name: "Profit",
+//     data: [20, 30, 30, 50, 10, 20]
+//   }
+// ];
 
-export let dates = [];
-
-// Function to load and parse CSV data
-export const loadData = async (setDataLoaded) => {
-  let data = await d3.csv(CSVURL, d => {
-    return {
-      date: d3.timeParse("%d/%m/%Y")(d.Date),
-      revenue: +d.Revenue.replace('$', '').replace('.', ''),
-      ebitda: +d.Ebitda.replace('$', '').replace('.', ''),
-      profit: +d.Profit.replace('$', '').replace('.', ''),
-      costs: +d.Costs.replace('$', '').replace('.', '')
-    };
-  });
-
-  // Sort data by date
-  data.sort((a, b) => a.date - b.date);
-
-  // Extract data for charts
-  const date = data.map(d => d.date);
-  const revenues = data.map(d => d.revenue / 1000);
-  const profits = data.map(d => d.profit / 1000);
-  const costs = data.map(d => d.costs / 1000);
-
-  // Update chart data
-  lineChartDataTotalSpentCSV[0].data = revenues;
-  lineChartDataTotalSpentCSV[1].data = profits;
-  barChartDataConsumptionCSV[0].data = costs.slice(-4);
-  barChartDataConsumptionCSV[1].data = profits.slice(-4);
-
-  // Update chart options
-  lineChartOptionsTotalSpentCSV.xaxis.categories = dates;
-  barChartOptionsConsumptionCSV.xaxis.categories = dates.slice(-4);
-
-  // Update dates
-  dates = date;
-
-  // Set data loaded to true
-  setDataLoaded(true);
-};
+// export const lineChartDataTotalSpentCSV = {
+//   data: [
+//     {x: 1920,y:50},
+//     {x: 1921,y:60},
+//     {x: 1922,y:70},
+//     {x: 1923,y:80},
+//     {x: 1924,y:90},
+//   ],
+// }
 
 export const lineChartDataTotalSpentCSV = [
   {
@@ -56,16 +34,45 @@ export const lineChartDataTotalSpentCSV = [
   }
 ];
 
-export const barChartDataConsumptionCSV = [
-  {
-    name: "Costs",
-    data: []
-  },
-  {
-    name: "Profit",
-    data: []
-  }
-];
+export let years = [];
+
+
+// Loading data from CSV
+export const loadData = async (setDataLoaded) => {
+  const data = await d3.csv('https://raw.githubusercontent.com/Duculet/testing/refs/heads/main/fortune500.csv');
+
+  const revenueData = data
+    .filter(d => d.Company === "General Motors")
+    .map(d => {
+      console.log(`Year: ${d.Year}, Revenue: ${d.Revenue}`);
+      years.push(+d.Year);
+      return +d.Revenue; // Convert to number
+    });
+
+  lineChartDataTotalSpentCSV[0].data = revenueData.slice(0, 50);
+  years = years.slice(0, 50)
+
+  const profitData = data
+    .filter(d => d.Company === "General Motors")
+    .map(d => {
+      console.log(`Year: ${d.Year}, Profit: ${d.Revenue}`);
+      return +d.Profit; // Convert to number
+    });
+
+  lineChartDataTotalSpentCSV[1].data = profitData.slice(0, 50);
+
+  const costsData = data
+    .filter(d => d.Company === "General Motors")
+    .map(d => {
+      console.log(`Year: ${d.Year}, Costs: ${d.Revenue - d.Profit}`);
+      return Math.floor(+d.Revenue - +d.Profit); // Convert to number
+    });
+
+  barChartDataConsumptionCSV[0].data = costsData.slice(0, 9);
+  barChartDataConsumptionCSV[1].data = profitData.slice(0, 9);
+
+  setDataLoaded(true);
+};
 
 export const lineChartOptionsTotalSpentCSV = {
   chart: {
@@ -108,8 +115,8 @@ export const lineChartOptionsTotalSpentCSV = {
     type: "line",
   },
   xaxis: {
-    type: "time",
-    categories: dates,
+    type: "numeric",
+    categories: years,
     labels: {
       style: {
         colors: "#A3AED0",
@@ -117,7 +124,7 @@ export const lineChartOptionsTotalSpentCSV = {
         fontWeight: "500",
       },
       formatter: function (val) {
-        return d3.timeFormat("%b %Y")(new Date(val));
+        return Math.floor(val);
       }
     },
     axisBorder: {
@@ -126,7 +133,7 @@ export const lineChartOptionsTotalSpentCSV = {
     axisTicks: {
       show: false,
     },
-    tickAmount: 10, // Adjust as needed
+    tickAmount: years.length, // Ensure all years are shown
   },
   yaxis: {
     show: false,
@@ -142,98 +149,6 @@ export const lineChartOptionsTotalSpentCSV = {
     },
   },
   color: ["#7551FF", "#39B8FF"],
-};
-
-export const barChartOptionsConsumptionCSV = {
-  chart: {
-    stacked: true,
-    toolbar: {
-      show: false,
-    },
-  },
-  tooltip: {
-    style: {
-      fontSize: "12px",
-      fontFamily: undefined,
-    },
-    onDatasetHover: {
-      style: {
-        fontSize: "12px",
-        fontFamily: undefined,
-      },
-    },
-    theme: "dark",
-  },
-  xaxis: {
-    type: "time",
-    categories: dates.slice(-4, dates.length - 1),
-    show: false,
-    labels: {
-      show: true,
-      style: {
-        colors: "#A3AED0",
-        fontSize: "14px",
-        fontWeight: "500",
-      },
-      formatter: function (val) {
-        return d3.timeFormat("%b %Y")(new Date(val));
-      }
-    },
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
-  },
-  yaxis: {
-    show: false,
-    color: "black",
-    labels: {
-      show: false,
-      style: {
-        colors: "#A3AED0",
-        fontSize: "14px",
-        fontWeight: "500",
-      },
-    },
-  },
-
-  grid: {
-    borderColor: "rgba(163, 174, 208, 0.3)",
-    show: true,
-    yaxis: {
-      lines: {
-        show: false,
-        opacity: 0.5,
-      },
-    },
-    row: {
-      opacity: 0.5,
-    },
-    xaxis: {
-      lines: {
-        show: false,
-      },
-    },
-  },
-  fill: {
-    type: "solid",
-    colors: ["#5E37FF", "#6AD2FF", "#E1E9F8"],
-  },
-  legend: {
-    show: false,
-  },
-  colors: ["#5E37FF", "#6AD2FF", "#E1E9F8"],
-  dataLabels: {
-    enabled: false,
-  },
-  plotOptions: {
-    bar: {
-      borderRadius: 10,
-      columnWidth: "20px",
-    },
-  },
 };
 
 export const barChartDataDailyTraffic = [
@@ -335,6 +250,105 @@ export const barChartOptionsDailyTraffic = {
     bar: {
       borderRadius: 10,
       columnWidth: "40px",
+    },
+  },
+};
+
+export const barChartDataConsumptionCSV = [
+  {
+    name: "Cost",
+    data: [],
+  },
+  {
+    name: "Profit",
+    data: [],
+  },
+];
+
+export const barChartOptionsConsumptionCSV = {
+  chart: {
+    stacked: true,
+    toolbar: {
+      show: false,
+    },
+  },
+  tooltip: {
+    style: {
+      fontSize: "12px",
+      fontFamily: undefined,
+    },
+    onDatasetHover: {
+      style: {
+        fontSize: "12px",
+        fontFamily: undefined,
+      },
+    },
+    theme: "dark",
+  },
+  xaxis: {
+    categories: years.slice(0, 9),
+    show: false,
+    labels: {
+      show: true,
+      style: {
+        colors: "#A3AED0",
+        fontSize: "14px",
+        fontWeight: "500",
+      },
+    },
+    axisBorder: {
+      show: false,
+    },
+    axisTicks: {
+      show: false,
+    },
+  },
+  yaxis: {
+    show: false,
+    color: "black",
+    labels: {
+      show: false,
+      style: {
+        colors: "#A3AED0",
+        fontSize: "14px",
+        fontWeight: "500",
+      },
+    },
+  },
+
+  grid: {
+    borderColor: "rgba(163, 174, 208, 0.3)",
+    show: true,
+    yaxis: {
+      lines: {
+        show: false,
+        opacity: 0.5,
+      },
+    },
+    row: {
+      opacity: 0.5,
+    },
+    xaxis: {
+      lines: {
+        show: false,
+      },
+    },
+  },
+  fill: {
+    type: "solid",
+    colors: ["#5E37FF", "#6AD2FF", "#E1E9F8"],
+  },
+  legend: {
+    show: false,
+  },
+  colors: ["#5E37FF", "#6AD2FF", "#E1E9F8"],
+  dataLabels: {
+    enabled: false,
+  },
+  plotOptions: {
+    bar: {
+      borderRadius: 10,
+      columnWidth: "20px",
     },
   },
 };

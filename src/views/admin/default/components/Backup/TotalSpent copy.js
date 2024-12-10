@@ -16,8 +16,11 @@ import { IoAlertCircle, IoCheckmarkCircle } from "react-icons/io5";
 import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
 // Assets
 import { RiArrowDownSFill, RiArrowUpSFill } from "react-icons/ri";
+import { char } from "stylis";
 import {
-  dates,
+  years,
+  lineChartDataTotalSpent,
+  lineChartOptionsTotalSpent,
   lineChartDataTotalSpentCSV,
   lineChartOptionsTotalSpentCSV,
   loadData
@@ -38,33 +41,25 @@ export default function TotalSpent(props) {
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
-    console.log(dates);
+    console.log(years);
   };
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
     setShowDropdown(false);
+  };
 
+  useEffect(() => {
     const filterDataByYears = (yearsInterval) => {
-      const filteredYears = dates.slice(-yearsInterval * 4);
+      const filteredYears = years.filter(year => year % yearsInterval === 0);
       const filteredData = lineChartDataTotalSpentCSV.map(dataset => ({
         ...dataset,
-        data: dataset.data.slice(-yearsInterval * 4)
+        data: dataset.data.filter((_, index) => filteredYears.includes(years[index]))
       }));
       return { filteredData, filteredYears };
     };
 
-    if (option === 'Year') {
-      const { filteredData, filteredYears } = filterDataByYears(1);
-      setChartData(filteredData);
-      setChartOptions({
-        ...lineChartOptionsTotalSpentCSV,
-        xaxis: {
-          ...lineChartOptionsTotalSpentCSV.xaxis,
-          categories: filteredYears,
-        },
-      });
-    } else if (option === '5 Years') {
+    if (selectedOption === '5 Years') {
       const { filteredData, filteredYears } = filterDataByYears(5);
       setChartData(filteredData);
       setChartOptions({
@@ -72,9 +67,10 @@ export default function TotalSpent(props) {
         xaxis: {
           ...lineChartOptionsTotalSpentCSV.xaxis,
           categories: filteredYears,
+          tickAmount: filteredYears.length,
         },
       });
-    } else if (option === '10 Years') {
+    } else if (selectedOption === '10 Years') {
       const { filteredData, filteredYears } = filterDataByYears(10);
       setChartData(filteredData);
       setChartOptions({
@@ -82,15 +78,7 @@ export default function TotalSpent(props) {
         xaxis: {
           ...lineChartOptionsTotalSpentCSV.xaxis,
           categories: filteredYears,
-        },
-      });
-    } else if (option === 'All Time') {
-      setChartData(lineChartDataTotalSpentCSV);
-      setChartOptions({
-        ...lineChartOptionsTotalSpentCSV,
-        xaxis: {
-          ...lineChartOptionsTotalSpentCSV.xaxis,
-          categories: dates,
+          tickAmount: filteredYears.length,
         },
       });
     } else {
@@ -99,11 +87,12 @@ export default function TotalSpent(props) {
         ...lineChartOptionsTotalSpentCSV,
         xaxis: {
           ...lineChartOptionsTotalSpentCSV.xaxis,
-          categories: dates,
+          categories: years,
+          tickAmount: years.length / 5,
         },
       });
     }
-  };
+  }, [selectedOption]);
 
   // Calculate percentage change for last year
   const calculatePercentageChange = () => {
@@ -114,7 +103,7 @@ export default function TotalSpent(props) {
     const percentageChange = ((lastValue - secondToLastValue) / secondToLastValue) * 100;
     return percentageChange.toFixed(2);
   };
-  const green = (calculatePercentageChange() >= 0)
+  const green = (calculatePercentageChange > 0)
 
   // Chakra Color Mode
 
@@ -180,12 +169,6 @@ export default function TotalSpent(props) {
                       color={textColorSecondary}
                       borderRadius='7px' 
                       onClick={() => handleOptionClick('10 Years')}>10 Years</Button>
-              <Button bg={boxBg}
-                      fontSize='sm'
-                      fontWeight='500'
-                      color={textColorSecondary}
-                      borderRadius='7px' 
-                      onClick={() => handleOptionClick('All Time')}>All Time</Button>
             </Box>
           )}
           <Button
@@ -213,7 +196,7 @@ export default function TotalSpent(props) {
             textAlign='start'
             fontWeight='700'
             lineHeight='100%'>
-            ${Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1])}m
+            {Math.floor(lineChartDataTotalSpentCSV[0].data[lineChartDataTotalSpentCSV[0].data.length - 1] / 1000)}k
           </Text>
           <Flex align='center' mb='20px'>
             <Text
@@ -225,17 +208,17 @@ export default function TotalSpent(props) {
               Total Revenue
             </Text>
             <Flex align='center'>
-              <Icon as={green ? RiArrowUpSFill : RiArrowDownSFill} color={green ? 'green.500' : 'red.500'} me='2px' mt='2px' />
-              <Text color={green ? 'green.500' : 'red.500'} fontSize='sm' fontWeight='700'>
+              <Icon as={!green ? RiArrowUpSFill : RiArrowDownSFill} color={!green ? 'green.500' : 'red.500'} me='2px' mt='2px' />
+              <Text color={!green ? 'green.500' : 'red.500'} fontSize='sm' fontWeight='700'>
                 {calculatePercentageChange()}%
               </Text>
             </Flex>
           </Flex>
 
           <Flex align='center'>
-            <Icon as={green ? IoCheckmarkCircle : IoAlertCircle} color={green ? 'green.500' : 'red.500'} me='4px' />
-            <Text color={green ? 'green.500' : 'red.500'} fontSize='md' fontWeight='700'>
-              {green ? 'On' : 'Off'} track
+            <Icon as={!green ? IoCheckmarkCircle : IoAlertCircle} color={!green ? 'green.500' : 'red.500'} me='4px' />
+            <Text color={!green ? 'green.500' : 'red.500'} fontSize='md' fontWeight='700'>
+              {!green ? 'On' : 'Off'} track
             </Text>
           </Flex>
         </Flex>
