@@ -124,7 +124,7 @@ export default function UserReports() {
 
   return (
     <div>
-      <Flex mb='20px' mt='80px' gap='20px' alignItems='center' justifyContent='center'>
+      <Flex mb='20px' mt={{ base: '120px', md: '80px'}} gap='20px' alignItems='center' justifyContent='center'>
         <Button
           p={!isEditing ? '5px 30px' : '5px 50px'}
           onClick={() => setIsEditing(!isEditing)}
