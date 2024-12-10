@@ -1,26 +1,3 @@
-/*!
-  _   _  ___  ____  ___ ________  _   _   _   _ ___   
- | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| 
- | |_| | | | | |_) || |  / / | | |  \| | | | | || | 
- |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |
- |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___|
-                                                                                                                                                                                                                                                                                                                                       
-=========================================================
-* Horizon UI - v1.1.0
-=========================================================
-
-* Product Page: https://www.horizon-ui.com/
-* Copyright 2023 Horizon UI (https://www.horizon-ui.com/)
-
-* Designed and Coded by Simmmple
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-// Chakra imports
 import React, { useState, useEffect } from "react";
 import { Button, Icon, SimpleGrid, Box, Select, Input, Flex } from "@chakra-ui/react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -29,6 +6,10 @@ import TotalSpent from "views/admin/default/components/TotalSpent";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import TotalRevenue from "./components/TotalRevenue";
 import TotalCosts from "./components/TotalCosts";
+import { saveOrderToServer, loadOrderFromServer } from './api/api';
+import { auth } from './api/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import Login from './components/Login';
 
 export default function UserReports() {
   const [isEditing, setIsEditing] = useState(false);
@@ -50,24 +31,39 @@ export default function UserReports() {
       content: <WeeklyRevenue />,
     }
   ]);
-  const [savedOrders, setSavedOrders] = useState([]);
+  const [savedOrders, setSavedOrders] = useState([{
+      name: 'Default Order',
+      order: ['1', '2', '3', '4']
+    }]);
   const [newOrderName, setNewOrderName] = useState('');
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    const loadInitialData = async () => {
+      const savedOrdersFromServer = await loadOrderFromServer();
+      if (savedOrdersFromServer) {
+        setSavedOrders(savedOrdersFromServer);
+        const defaultOrder = savedOrdersFromServer.find(order => order.name === 'Default Order');
+        if (defaultOrder) {
+          setComponents(defaultOrder.order.map(id => ({
+            id,
+            content: getComponentById(id)
+          })));
+        }
+      }
+    };
 
-    const savedComponents = localStorage.getItem('components');
-    if (savedComponents) {
-      const parsedComponents = JSON.parse(savedComponents);
-      setComponents(parsedComponents.map(component => ({
-        ...component,
-        content: getComponentById(component.id)
-      })));
-    }
+    loadInitialData();
 
-    const savedOrders = localStorage.getItem('savedOrders');
-    if (savedOrders) {
-      setSavedOrders(JSON.parse(savedOrders));
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const getComponentById = (id) => {
@@ -93,7 +89,6 @@ export default function UserReports() {
     items.splice(result.destination.index, 0, reorderedItem);
 
     setComponents(items);
-    localStorage.setItem('components', JSON.stringify(items.map(item => ({ id: item.id }))));
   };
 
   const handleOrderChange = (event) => {
@@ -108,7 +103,7 @@ export default function UserReports() {
     }
   };
 
-  const handleSaveOrder = () => {
+  const handleSaveOrder = async () => {
     if (!newOrderName) return;
 
     const newOrder = {
@@ -120,11 +115,17 @@ export default function UserReports() {
     setSavedOrders(updatedOrders);
     localStorage.setItem('savedOrders', JSON.stringify(updatedOrders));
     setNewOrderName('');
+
+    await saveOrderToServer(newOrder);
   };
+
+  if (!user) {
+    return <Login onLogin={() => setUser(auth.currentUser)} />;
+  }
 
   return (
     <div>
-      <Flex mb='20px' mt={{ base: '120px', md: '80px'}} gap='20px' alignItems='center' justifyContent='center'>
+      <Flex mb='20px' mt={{ base: '120px', md: '80px' }} gap='20px' alignItems='center' justifyContent='center'>
         <Button
           p={!isEditing ? '5px 30px' : '5px 50px'}
           onClick={() => setIsEditing(!isEditing)}
@@ -146,8 +147,6 @@ export default function UserReports() {
           p='5px 50px'
           onClick={handleSaveOrder}
           leftIcon={<Icon as={MdSave} />}
-          isActive={!isEditing}
-          isDisabled={!isEditing}
         >
           Save Order
         </Button>
