@@ -127,8 +127,6 @@ export default function UserReports() {
     <div>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap='20px' width="100%" mt={{base: '120px', md: '80px'}} mb={'20px'}>
           <Button
-            size="sm"
-            backgroundColor={'white'}
             p={!isEditing ? '5px 30px' : '5px 50px'}
             onClick={() => setIsEditing(!isEditing)}
             leftIcon={<Icon as={MdEdit} />}
@@ -138,7 +136,6 @@ export default function UserReports() {
           <Select
             placeholder="Select preset"
             onChange={handleOrderChange}
-            width="100%"
           >
             {savedOrders.map(order => (
               <option key={order.name} value={order.name}>{order.name}</option>
@@ -148,12 +145,10 @@ export default function UserReports() {
             placeholder="New preset name"
             value={newOrderName}
             onChange={(e) => setNewOrderName(e.target.value)}
-            width="100%"
           />
           <Button
-            size="sm"
+            height={"40px"}
             p='5px 50px'
-            backgroundColor={'white'}
             isDisabled={!isEditing}
             onClick={handleSaveOrder}
             leftIcon={<Icon as={MdSave} />}
