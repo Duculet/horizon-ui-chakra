@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Icon, SimpleGrid, Box, Select, Input, Flex } from "@chakra-ui/react";
+import { Button, Icon, SimpleGrid, Box, Select, Input } from "@chakra-ui/react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MdEdit, MdSave } from 'react-icons/md';
 import TotalSpent from "views/admin/default/components/TotalSpent";
@@ -125,35 +125,42 @@ export default function UserReports() {
 
   return (
     <div>
-      <Flex mb='20px' mt={{ base: '120px', md: '80px' }} gap='20px' alignItems='center' justifyContent='center'>
-        <Button
-          backgroundColor={'white'}
-          p={!isEditing ? '5px 30px' : '5px 50px'}
-          onClick={() => setIsEditing(!isEditing)}
-          leftIcon={<Icon as={MdEdit} />}
-        >
-          {isEditing ? 'Stop Editing' : 'Edit'}
-        </Button>
-        <Select placeholder="Select preset" onChange={handleOrderChange}>
-          {savedOrders.map(order => (
-            <option key={order.name} value={order.name}>{order.name}</option>
-          ))}
-        </Select>
-        <Input
-          placeholder="New preset name"
-          value={newOrderName}
-          onChange={(e) => setNewOrderName(e.target.value)}
-        />
-        <Button
-          p='5px 50px'
-          backgroundColor={'white'}
-          isDisabled={!isEditing}
-          onClick={handleSaveOrder}
-          leftIcon={<Icon as={MdSave} />}
-        >
-          Save Order
-        </Button>
-      </Flex>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap='20px' width="100%" mt={{base: '120px', md: '80px'}} mb={'20px'}>
+          <Button
+            size="sm"
+            backgroundColor={'white'}
+            p={!isEditing ? '5px 30px' : '5px 50px'}
+            onClick={() => setIsEditing(!isEditing)}
+            leftIcon={<Icon as={MdEdit} />}
+          >
+            {isEditing ? 'Stop Editing' : 'Edit'}
+          </Button>
+          <Select
+            placeholder="Select preset"
+            onChange={handleOrderChange}
+            width="100%"
+          >
+            {savedOrders.map(order => (
+              <option key={order.name} value={order.name}>{order.name}</option>
+            ))}
+          </Select>
+          <Input
+            placeholder="New preset name"
+            value={newOrderName}
+            onChange={(e) => setNewOrderName(e.target.value)}
+            width="100%"
+          />
+          <Button
+            size="sm"
+            p='5px 50px'
+            backgroundColor={'white'}
+            isDisabled={!isEditing}
+            onClick={handleSaveOrder}
+            leftIcon={<Icon as={MdSave} />}
+          >
+            Save Order
+          </Button>
+        </SimpleGrid>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId='droppable'>
           {(provided) => (
