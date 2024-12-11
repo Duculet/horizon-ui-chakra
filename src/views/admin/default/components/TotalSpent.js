@@ -27,7 +27,7 @@ export default function TotalSpent(props) {
   const { ...rest } = props;
 
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('Year');
+  const [selectedOption, setSelectedOption] = useState('All Time');
   const [chartData, setChartData] = useState(lineChartDataTotalSpentCSV);
   const [chartOptions, setChartOptions] = useState(lineChartOptionsTotalSpentCSV);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -167,13 +167,7 @@ export default function TotalSpent(props) {
                       fontWeight='500'
                       color={textColorSecondary}
                       borderRadius='7px' 
-                      onClick={() => handleOptionClick('Year')}>Year</Button>
-              <Button bg={boxBg}
-                      fontSize='sm'
-                      fontWeight='500'
-                      color={textColorSecondary}
-                      borderRadius='7px' 
-                      onClick={() => handleOptionClick('5 Years')}>5 Years</Button>
+                      onClick={() => handleOptionClick('All Time')}>All Time</Button>
               <Button bg={boxBg}
                       fontSize='sm'
                       fontWeight='500'
@@ -185,7 +179,13 @@ export default function TotalSpent(props) {
                       fontWeight='500'
                       color={textColorSecondary}
                       borderRadius='7px' 
-                      onClick={() => handleOptionClick('All Time')}>All Time</Button>
+                      onClick={() => handleOptionClick('5 Years')}>5 Years</Button>
+              <Button bg={boxBg}
+                      fontSize='sm'
+                      fontWeight='500'
+                      color={textColorSecondary}
+                      borderRadius='7px' 
+                      onClick={() => handleOptionClick('Year')}>Year</Button>
             </Box>
           )}
           <Button

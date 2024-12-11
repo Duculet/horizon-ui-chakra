@@ -18,6 +18,7 @@ import RTL from 'views/admin/rtl';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
+import ProfileSettings from 'components/navbar/ProfileSettings';
 
 const routes = [
   {
@@ -26,6 +27,13 @@ const routes = [
     path: '/default',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     component: <MainDashboard />,
+  },
+  {
+    name: 'Profle Settings',
+    layout: '/admin',
+    path: '/profile-settings',
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    component: <ProfileSettings />,
   },
   {
     name: 'NFT Marketplace',
