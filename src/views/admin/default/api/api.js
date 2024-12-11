@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, addDoc, getDocs, query, where, doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export const saveOrderToServer = async (order) => {
   try {
@@ -22,5 +22,14 @@ export const loadOrderFromServer = async () => {
     return orders;
   } catch (e) {
     console.error('Error loading documents: ', e);
+  }
+};
+
+export const deleteOrderFromServer = async (orderName) => {
+  try {
+    await deleteDoc(doc(db, 'orders', orderName));
+    console.log(`Order ${orderName} deleted successfully`);
+  } catch (e) {
+    console.error('Error deleting document: ', e);
   }
 };

@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Button, Icon, SimpleGrid, Box, Select, Input } from "@chakra-ui/react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { MdEdit, MdSave } from 'react-icons/md';
+import { MdAdd, MdDelete, MdEdit, MdSave } from 'react-icons/md';
 import TotalSpent from "views/admin/default/components/TotalSpent";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import TotalRevenue from "./components/TotalRevenue";
 import TotalCosts from "./components/TotalCosts";
-import { saveOrderToServer, loadOrderFromServer } from './api/api';
+import { saveOrderToServer, loadOrderFromServer, deleteOrderFromServer } from './api/api';
 import { auth } from './api/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Login from './components/Login';
+import NewComponent from "./components/NewComponent";
 
 export default function UserReports() {
   const [isEditing, setIsEditing] = useState(false);
@@ -36,6 +37,7 @@ export default function UserReports() {
       order: ['1', '2', '3', '4']
     }]);
   const [newOrderName, setNewOrderName] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -93,6 +95,7 @@ export default function UserReports() {
 
   const handleOrderChange = (event) => {
     const order = event.target.value;
+    setSelectedOrder(order);
     const selectedOrder = savedOrders.find(o => o.name === order);
     if (selectedOrder) {
       const newOrder = selectedOrder.order.map(id => ({
@@ -115,8 +118,36 @@ export default function UserReports() {
     setSavedOrders(updatedOrders);
     setNewOrderName('');
     setIsEditing(false);
+    setSelectedOrder(newOrder.name);
 
     await saveOrderToServer(newOrder);
+  };
+
+  const handleDeleteOrder = async () => {
+    if (!selectedOrder) return;
+
+    const updatedOrders = savedOrders.filter(order => order.name !== selectedOrder);
+    setSavedOrders(updatedOrders);
+    setSelectedOrder(null);
+
+    await deleteOrderFromServer(selectedOrder);
+  };
+
+  const handleAddComponent = async () => {
+    const newId = (components.length + 1).toString();
+    const newComponent = {
+      id: newId,
+      content: <NewComponent />
+    };
+    const updatedComponents = [...components, newComponent];
+    setComponents(updatedComponents);
+
+    // Update the default order with the new component
+    const defaultOrder = savedOrders.find(order => order.name === 'Default Order');
+    if (defaultOrder) {
+      defaultOrder.order.push(newId);
+      await saveOrderToServer(defaultOrder);
+    }
   };
 
   if (!user) {
@@ -133,9 +164,17 @@ export default function UserReports() {
           >
             {isEditing ? 'Stop Editing' : 'Edit'}
           </Button>
+          {/* <Button
+            p='5px 30px'
+            onClick={handleAddComponent}
+            leftIcon={<Icon as={MdAdd} />}
+          >
+            Add
+          </Button> */}
           <Select
             placeholder="Select preset"
             onChange={handleOrderChange}
+            value={selectedOrder}
           >
             {savedOrders.map(order => (
               <option key={order.name} value={order.name}>{order.name}</option>
@@ -150,10 +189,10 @@ export default function UserReports() {
             height={"40px"}
             p='5px 50px'
             isDisabled={!isEditing}
-            onClick={handleSaveOrder}
-            leftIcon={<Icon as={MdSave} />}
+            onClick={selectedOrder ? handleDeleteOrder : handleSaveOrder}
+            leftIcon={<Icon as={selectedOrder ? MdDelete : MdSave} />}
           >
-            Save Order
+            {selectedOrder ? 'Delete Order' : 'Save Order'}
           </Button>
         </SimpleGrid>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -180,6 +219,9 @@ export default function UserReports() {
                   )}
                 </Draggable>
               ))}
+              <Box>
+                <NewComponent />
+              </Box>
               {provided.placeholder}
             </SimpleGrid>
           )}
