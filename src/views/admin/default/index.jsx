@@ -113,8 +113,8 @@ export default function UserReports() {
 
     const updatedOrders = [...savedOrders, newOrder];
     setSavedOrders(updatedOrders);
-    localStorage.setItem('savedOrders', JSON.stringify(updatedOrders));
     setNewOrderName('');
+    setIsEditing(false);
 
     await saveOrderToServer(newOrder);
   };
