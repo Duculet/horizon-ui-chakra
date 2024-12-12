@@ -171,13 +171,13 @@ export default function UserReports() {
           >
             {isEditing ? 'Stop Editing' : 'Edit'}
           </Button>
-          <Button
+          {/* <Button
             p='5px 30px'
             onClick={handleAddComponent}
             leftIcon={<Icon as={MdAdd} />}
           >
             Add
-          </Button>
+          </Button> */}
           <Select
             placeholder="Select preset"
             onChange={handleOrderChange}
