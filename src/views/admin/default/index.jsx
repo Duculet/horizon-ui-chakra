@@ -6,9 +6,8 @@ import TotalSpent from "views/admin/default/components/TotalSpent";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import TotalRevenue from "./components/TotalRevenue";
 import TotalCosts from "./components/TotalCosts";
-import { saveOrderToServer, loadOrderFromServer, deleteOrderFromServer } from './api/api';
-import { auth } from './api/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { saveOrderToServer, loadOrderFromServer, deleteOrderFromServer } from './api/sapi';
+import { getUser } from './api/auth';
 import Login from './components/Login';
 import NewComponent from "./components/NewComponent";
 
@@ -43,6 +42,7 @@ export default function UserReports() {
   useEffect(() => {
     const loadInitialData = async () => {
       const savedOrdersFromServer = await loadOrderFromServer();
+      console.log(savedOrdersFromServer)
       if (savedOrdersFromServer) {
         setSavedOrders(savedOrdersFromServer);
         const defaultOrder = savedOrdersFromServer.find(order => order.name === 'Default Order');
@@ -57,15 +57,12 @@ export default function UserReports() {
 
     loadInitialData();
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
+    const checkUser = async () => {
+      const user = await getUser();
+      setUser(user);
+    };
 
-    return () => unsubscribe();
+    checkUser();
   }, []);
 
   const getComponentById = (id) => {
@@ -94,24 +91,34 @@ export default function UserReports() {
   };
 
   const handleOrderChange = (event) => {
-    const order = event.target.value;
-    setSelectedOrder(order);
-    const selectedOrder = savedOrders.find(o => o.name === order);
-    if (selectedOrder) {
-      const newOrder = selectedOrder.order.map(id => ({
-        id,
-        content: getComponentById(id)
-      }));
-      setComponents(newOrder);
-    }
-  };
+  const order = event.target.value;
+  setSelectedOrder(order);
+
+  // Find the selected order by name
+  const selectedOrder = savedOrders.find(o => o.name === order);
+  console.log(selectedOrder);
+
+  if (selectedOrder) {
+    // Parse 'ids' as it's a stringified array
+    const idsArray = JSON.parse(selectedOrder.ids);
+
+    // Map over the parsed 'ids' array and get the components
+    const newOrder = idsArray.map(id => ({
+      id,
+      content: getComponentById(id)  // Assuming getComponentById is a function that returns a component by ID
+    }));
+
+    // Set the components in the state
+    setComponents(newOrder);
+  }
+};
 
   const handleSaveOrder = async () => {
     if (!newOrderName) return;
 
     const newOrder = {
       name: newOrderName,
-      order: components.map(component => component.id)
+      ids: components.map(component => component.id)
     };
 
     const updatedOrders = [...savedOrders, newOrder];
@@ -137,7 +144,7 @@ export default function UserReports() {
     const newId = (components.length + 1).toString();
     const newComponent = {
       id: newId,
-      content: <NewComponent />
+      content: <TotalRevenue />
     };
     const updatedComponents = [...components, newComponent];
     setComponents(updatedComponents);
@@ -151,7 +158,7 @@ export default function UserReports() {
   };
 
   if (!user) {
-    return <Login onLogin={() => setUser(auth.currentUser)} />;
+    return <Login onLogin={() => setUser(getUser())} />;
   }
 
   return (
@@ -164,17 +171,17 @@ export default function UserReports() {
           >
             {isEditing ? 'Stop Editing' : 'Edit'}
           </Button>
-          {/* <Button
+          <Button
             p='5px 30px'
             onClick={handleAddComponent}
             leftIcon={<Icon as={MdAdd} />}
           >
             Add
-          </Button> */}
+          </Button>
           <Select
             placeholder="Select preset"
             onChange={handleOrderChange}
-            value={selectedOrder}
+            value={selectedOrder ? selectedOrder : ''}
           >
             {savedOrders.map(order => (
               <option key={order.name} value={order.name}>{order.name}</option>
