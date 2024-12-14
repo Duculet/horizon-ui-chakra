@@ -38,7 +38,7 @@ export default function TotalSpent(props) {
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
-    console.log(dates);
+    // console.log(dates);
   };
 
   const handleOptionClick = (option) => {

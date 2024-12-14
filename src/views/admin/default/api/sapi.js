@@ -42,3 +42,29 @@ export const deleteOrderFromServer = async (orderName) => {
     console.error('Error deleting order: ', e);
   }
 };
+
+export const saveComponentMapToServer = async (componentMap) => {
+  try {
+    const { data, error } = await supabase
+      .from('component_map')
+      .upsert(componentMap, { onConflict: ['id'] });
+
+    if (error) throw error;
+    return data;
+  } catch (e) {
+    console.error('Error saving component map: ', e);
+  }
+};
+
+export const loadComponentMapFromServer = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('component_map')
+      .select('*');
+
+    if (error) throw error;
+    return data;
+  } catch (e) {
+    console.error('Error loading component map: ', e);
+  }
+};

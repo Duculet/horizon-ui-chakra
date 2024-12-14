@@ -44,7 +44,7 @@ export const loadData = async (setDataLoaded) => {
   const revenueData = data
     .filter(d => d.Company === "General Motors")
     .map(d => {
-      console.log(`Year: ${d.Year}, Revenue: ${d.Revenue}`);
+      // console.log(`Year: ${d.Year}, Revenue: ${d.Revenue}`);
       years.push(+d.Year);
       return +d.Revenue; // Convert to number
     });
@@ -55,7 +55,7 @@ export const loadData = async (setDataLoaded) => {
   const profitData = data
     .filter(d => d.Company === "General Motors")
     .map(d => {
-      console.log(`Year: ${d.Year}, Profit: ${d.Revenue}`);
+      // console.log(`Year: ${d.Year}, Profit: ${d.Revenue}`);
       return +d.Profit; // Convert to number
     });
 
@@ -64,7 +64,7 @@ export const loadData = async (setDataLoaded) => {
   const costsData = data
     .filter(d => d.Company === "General Motors")
     .map(d => {
-      console.log(`Year: ${d.Year}, Costs: ${d.Revenue - d.Profit}`);
+      // console.log(`Year: ${d.Year}, Costs: ${d.Revenue - d.Profit}`);
       return Math.floor(+d.Revenue - +d.Profit); // Convert to number
     });
 
