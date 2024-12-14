@@ -160,7 +160,8 @@ export default function UserReports() {
   };
 
   const handleAddComponent = async (type) => {
-    const newId = (components.length + 1).toString();
+    const componentMapFromServer = await loadComponentMapFromServer();
+    const newId = (componentMapFromServer.length + 1).toString();
     const newComponent = getComponentByType(type);
     const updatedComponents = [...components, { id: newId, content: newComponent }];
     setComponents(updatedComponents);
@@ -191,17 +192,11 @@ export default function UserReports() {
           >
             {isEditing ? 'Stop Editing' : 'Edit'}
           </Button>
-          <Button
-            p='5px 30px'
-            onClick={() => setShowAddForm(true)}
-            leftIcon={<Icon as={MdAdd} />}
-          >
-            Add
-          </Button>
           <Select
             placeholder="Select preset"
             onChange={handleOrderChange}
             value={selectedOrder ? selectedOrder : ''}
+            textAlign={"center"}
           >
             {savedOrders.map(order => (
               <option key={order.name} value={order.name}>{order.name}</option>
@@ -211,6 +206,7 @@ export default function UserReports() {
             placeholder="New preset name"
             value={newOrderName}
             onChange={(e) => setNewOrderName(e.target.value)}
+            textAlign={"center"}
           />
           <Button
             height={"40px"}
@@ -222,11 +218,6 @@ export default function UserReports() {
             {selectedOrder ? 'Delete Order' : 'Save Order'}
           </Button>
         </SimpleGrid>
-      {showAddForm && (
-      <Flex mb='20px' alignItems='center' justifyContent='center'>
-        <AddComponentForm onAdd={handleAddComponent} />
-      </Flex>
-      )}
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId='droppable'>
           {(provided) => (
@@ -244,7 +235,7 @@ export default function UserReports() {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      // className={isEditing ? 'jiggle' : ''} // add jiggle class for fun
+                      className={isEditing ? 'jiggle' : ''} // add jiggle class for fun
                     >
                       {component.content}
                     </Box>
@@ -252,7 +243,7 @@ export default function UserReports() {
                 </Draggable>
               ))}
               <Box>
-                <NewComponent />
+                <NewComponent onAdd={handleAddComponent} />
               </Box>
               {provided.placeholder}
             </SimpleGrid>
