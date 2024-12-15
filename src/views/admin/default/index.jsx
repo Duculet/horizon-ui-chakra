@@ -13,6 +13,7 @@ import NewComponent from "./components/NewComponent";
 
 export default function UserReports() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
+  const bgColor = useColorModeValue("white", "navy.800");
   const [isEditing, setIsEditing] = useState(false);
   const [components, setComponents] = useState([
     {
@@ -245,7 +246,10 @@ export default function UserReports() {
                 </Draggable>
               ))}
               <Box>
-                <NewComponent onAdd={handleAddComponent} />
+                <NewComponent 
+                  backgroundColor={bgColor} 
+                  onAdd={handleAddComponent} 
+                />
               </Box>
               {provided.placeholder}
             </SimpleGrid>

@@ -4,7 +4,8 @@ import { loadData } from 'variables/charts';
 import { MdAdd } from 'react-icons/md';
 import AddComponentForm from './AddComponentsForm';
 
-const NewComponent = ({ onAdd }) => {
+const NewComponent = (props) => {
+  const { onAdd, ...rest } = props;
   const brandColor = useColorModeValue("brand.500", "white");
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -44,6 +45,7 @@ const NewComponent = ({ onAdd }) => {
       ref={componentRef}
       onClick={() => setShowAddForm(true)}
       cursor="pointer"
+      {...rest}
       >
       <Flex
         my='auto'
