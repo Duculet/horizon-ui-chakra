@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Icon, SimpleGrid, Box, Select, Input } from "@chakra-ui/react";
+import { Button, Icon, SimpleGrid, Box, Select, Input, useColorModeValue } from "@chakra-ui/react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MdDelete, MdEdit, MdSave } from 'react-icons/md';
 import TotalSpent from "views/admin/default/components/TotalSpent";
@@ -12,6 +12,7 @@ import Login from './components/Login';
 import NewComponent from "./components/NewComponent";
 
 export default function UserReports() {
+  const textColor = useColorModeValue("secondaryGray.900", "white");
   const [isEditing, setIsEditing] = useState(false);
   const [components, setComponents] = useState([
     {
@@ -201,8 +202,12 @@ export default function UserReports() {
           </Select>
           <Input
             placeholder="New preset name"
+            color={textColor}
             value={newOrderName}
-            onChange={(e) => setNewOrderName(e.target.value)}
+            onChange={(e) => {
+              setNewOrderName(e.target.value);
+              setSelectedOrder(null);
+            }}
             textAlign={"center"}
           />
           <Button
