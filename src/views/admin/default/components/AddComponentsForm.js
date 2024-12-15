@@ -40,6 +40,7 @@ const AddComponentForm = ({ onAdd, onCloseForm }) => {
           type="submit" 
           color={brandColor} 
           width="200px"
+          mb={4}
         >
           Add Component
         </Button>
