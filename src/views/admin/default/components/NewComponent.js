@@ -20,12 +20,16 @@ const NewComponent = ({ onAdd }) => {
   }
 
   const handleClose = () => {
-    console.log('FORM IS CLOSING');
     setShowAddForm(false);
   };
 
   return (
-    <Card py='15px' borderRadius={'3xl'} onClick={() => setShowAddForm(true)}>
+    <Card 
+      py='15px' 
+      borderRadius={'3xl'} 
+      onClick={() => setShowAddForm(true)}
+      cursor="pointer"
+      >
       <Flex
         my='auto'
         h='100%'

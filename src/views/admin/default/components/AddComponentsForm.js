@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Select, useColorModeValue } from '@chakra-ui/react';
+import { Button, Flex, Select, useColorModeValue } from '@chakra-ui/react';
 
 const AddComponentForm = ({ onAdd, onCloseForm }) => {
   const [componentType, setComponentType] = useState('TotalRevenue');
@@ -10,37 +10,46 @@ const AddComponentForm = ({ onAdd, onCloseForm }) => {
     onAdd(componentType);
   };
 
+  const handleSubmitClose = (e) => {
+    e.preventDefault();
+    onCloseForm();
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <Select
-        value={componentType}
-        onChange={(e) => setComponentType(e.target.value)}
-        mb={4}
-        textAlign="center"
-        sx={{
-          '& option': {
-            textAlign: 'center',
-            display: 'flex',
-            justifyContent: 'center',
-          }
-        }}
-      >
-        <option value="TotalRevenue">TotalRevenue</option>
-        <option value="TotalCosts">TotalCosts</option>
-        <option value="TotalSpent">TotalSpent</option>
-        <option value="WeeklyRevenue">WeeklyRevenue</option>
-      </Select>
-      <Button 
-        type="submit" 
-        color={brandColor} 
-        width="full"
-      >
-        Add Component
+    <Flex direction='column' w='100%' align='center'>
+      <form onSubmit={handleSubmit}>
+        <Select
+          value={componentType}
+          onChange={(e) => setComponentType(e.target.value)}
+          mb={4}
+          textAlign="center"
+          sx={{
+            '& option': {
+              textAlign: 'center',
+              display: 'flex',
+              justifyContent: 'center',
+            }
+          }}
+        >
+          <option value="TotalRevenue">TotalRevenue</option>
+          <option value="TotalCosts">TotalCosts</option>
+          <option value="TotalSpent">TotalSpent</option>
+          <option value="WeeklyRevenue">WeeklyRevenue</option>
+        </Select>
+        <Button 
+          type="submit" 
+          color={brandColor} 
+          width="200px"
+        >
+          Add Component
+        </Button>
+      </form>
+      <form onSubmit={handleSubmitClose}>
+      <Button type="submit" colorScheme="red" width="200px">
+          Cancel
       </Button>
-      <Button onClick={onCloseForm} colorScheme="red" width="full">
-        Cancel
-      </Button>
-    </form>
+      </form>
+    </Flex>
   );
 };
 
