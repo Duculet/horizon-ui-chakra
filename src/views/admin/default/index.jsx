@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Button, Icon, SimpleGrid, Box, Select, Input, Flex } from "@chakra-ui/react";
+import { Button, Icon, SimpleGrid, Box, Select, Input } from "@chakra-ui/react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { MdAdd, MdDelete, MdEdit, MdSave } from 'react-icons/md';
+import { MdDelete, MdEdit, MdSave } from 'react-icons/md';
 import TotalSpent from "views/admin/default/components/TotalSpent";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import TotalRevenue from "./components/TotalRevenue";
@@ -10,7 +10,6 @@ import { saveOrderToServer, loadOrderFromServer, deleteOrderFromServer, saveComp
 import { getUser } from './api/auth';
 import Login from './components/Login';
 import NewComponent from "./components/NewComponent";
-import AddComponentForm from "./components/AddComponentsForm";
 
 export default function UserReports() {
   const [isEditing, setIsEditing] = useState(false);
@@ -39,7 +38,6 @@ export default function UserReports() {
   const [newOrderName, setNewOrderName] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [user, setUser] = useState(null);
-  const [showAddForm, setShowAddForm] = useState(false);
   const [componentMap, setComponentMap] = useState({
     1: <TotalRevenue />,
     2: <TotalCosts />,
@@ -175,7 +173,6 @@ export default function UserReports() {
     // Save the new component to the server
     await saveComponentMapToServer([{ component_type: type }]);
 
-    setShowAddForm(false);
   };
 
   if (!user) {
@@ -230,12 +227,12 @@ export default function UserReports() {
             >
               {components.map((component, index) => (
                 <Draggable key={component.id} draggableId={component.id} index={index} isDragDisabled={!isEditing}>
-                  {(provided) => (
+                  {(provided, snapshot) => (
                     <Box
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className={isEditing ? 'jiggle' : ''} // add jiggle class for fun
+                      // className={isEditing && !snapshot.isDragging ? 'jiggle' : ''} // add jiggle class for fun
                     >
                       {component.content}
                     </Box>

@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { Box, Button, Select, Flex, useColorModeValue } from '@chakra-ui/react';
+import { Button, Select, useColorModeValue } from '@chakra-ui/react';
 
-const AddComponentForm = ({ onAdd, onClose }) => {
+const AddComponentForm = ({ onAdd, onCloseForm }) => {
   const [componentType, setComponentType] = useState('TotalRevenue');
-
   const brandColor = useColorModeValue("brand.500", "white");
-  const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const textColor = useColorModeValue("secondaryGray.900", "white");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -23,8 +20,6 @@ const AddComponentForm = ({ onAdd, onClose }) => {
         sx={{
           '& option': {
             textAlign: 'center',
-          },
-          '& option': {
             display: 'flex',
             justifyContent: 'center',
           }
@@ -42,7 +37,7 @@ const AddComponentForm = ({ onAdd, onClose }) => {
       >
         Add Component
       </Button>
-      <Button onClick={onClose} colorScheme="red" width="full">
+      <Button onClick={onCloseForm} colorScheme="red" width="full">
         Cancel
       </Button>
     </form>
