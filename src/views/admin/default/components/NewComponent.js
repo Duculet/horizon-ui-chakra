@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { Card, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react';
 import { loadData } from 'variables/charts';
 import { MdAdd } from 'react-icons/md';
@@ -9,6 +9,7 @@ const NewComponent = ({ onAdd }) => {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [dataLoaded, setDataLoaded] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const componentRef = useRef(null);
 
   useEffect(() => {
     loadData(setDataLoaded);
@@ -23,10 +24,24 @@ const NewComponent = ({ onAdd }) => {
     setShowAddForm(false);
   };
 
+  const handleClickOutside = (event) => {
+    if (componentRef.current && !componentRef.current.contains(event.target)) {
+      setShowAddForm(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <Card 
       py='15px' 
       borderRadius={'3xl'} 
+      ref={componentRef}
       onClick={() => setShowAddForm(true)}
       cursor="pointer"
       >
