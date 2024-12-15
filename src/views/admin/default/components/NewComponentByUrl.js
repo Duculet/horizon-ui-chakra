@@ -3,8 +3,9 @@ import { Card, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react';
 import { loadData } from 'variables/charts';
 import { MdAdd } from 'react-icons/md';
 import AddComponentForm from './AddComponentsForm';
+import AddComponentsFormUrl from './AddComponentsFormUrl';
 
-const NewComponent = (props) => {
+const NewComponentByUrl = (props) => {
   const { onAdd, text, ...rest } = props;
   const brandColor = useColorModeValue("brand.500", "white");
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -16,8 +17,8 @@ const NewComponent = (props) => {
     loadData(setDataLoaded);
   }, []);
 
-  const handleAdd = (componentType) => {
-    onAdd(componentType);
+  const handleAdd = (url, componentType) => {
+    onAdd(url, componentType);
     setShowAddForm(false);
   }
 
@@ -56,7 +57,7 @@ const NewComponent = (props) => {
       >
       {showAddForm ? (
         <>
-          <AddComponentForm onAdd={handleAdd} onCloseForm={handleClose}/>
+          <AddComponentsFormUrl onAdd={handleAdd} onCloseForm={handleClose}/>
         </>
       ) : (
         <>
@@ -71,4 +72,4 @@ const NewComponent = (props) => {
   )
 };
 
-export default NewComponent;
+export default NewComponentByUrl;

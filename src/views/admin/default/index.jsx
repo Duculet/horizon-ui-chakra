@@ -10,6 +10,8 @@ import { saveOrderToServer, loadOrderFromServer, deleteOrderFromServer, saveComp
 import { getUser } from './api/auth';
 import Login from './components/Login';
 import NewComponent from "./components/NewComponent";
+import NewComponentByUrl from "./components/NewComponentByUrl";
+import TotalSomething from "./components/TotalSomething";
 
 export default function UserReports() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -85,6 +87,15 @@ export default function UserReports() {
     checkUser();
   }, [componentMap]);
 
+  const getComponentByTypeAndUrl = (url, type) => {
+    switch (type) {
+      case 'TotalSomething':
+        return <TotalSomething datasetUrl={url} />;
+      default:
+        return null;
+    }
+  };
+
   const getComponentByType = (type) => {
     switch (type) {
       case 'TotalRevenue':
@@ -159,6 +170,26 @@ export default function UserReports() {
     await deleteOrderFromServer(selectedOrder);
   };
 
+  const handleAddComponentByUrl = async (url, type) => {
+    const componentMapFromServer = await loadComponentMapFromServer();
+    const newId = (componentMapFromServer.length + 1).toString();
+    const newComponent = getComponentByTypeAndUrl(url, type);
+    const updatedComponents = [...components, { id: newId, content: newComponent }];
+    setComponents(updatedComponents);
+
+    console.log(newComponent);
+    console.log(newId);
+
+    // Update the component map with the new component
+    setComponentMap(prevMap => ({
+      ...prevMap,
+      [newId]: newComponent
+    }));
+
+    // Save the new component to the server
+    await saveComponentMapToServer([{ component_type: type }]);
+  };
+
   const handleAddComponent = async (type) => {
     const componentMapFromServer = await loadComponentMapFromServer();
     const newId = (componentMapFromServer.length + 1).toString();
@@ -174,7 +205,6 @@ export default function UserReports() {
 
     // Save the new component to the server
     await saveComponentMapToServer([{ component_type: type }]);
-
   };
 
   if (!user) {
@@ -246,11 +276,18 @@ export default function UserReports() {
                 </Draggable>
               ))}
               <Box>
-                <NewComponent 
+                <NewComponentByUrl 
+                  backgroundColor={bgColor} 
+                  onAdd={handleAddComponentByUrl} 
+                  text={"Add Component by URL"}
+                />
+                
+              </Box>
+              <NewComponent 
                   backgroundColor={bgColor} 
                   onAdd={handleAddComponent} 
+                  text={"Add Component"}
                 />
-              </Box>
               {provided.placeholder}
             </SimpleGrid>
           )}
