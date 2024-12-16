@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Icon, SimpleGrid, Box, Select, Input, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Button, Icon, SimpleGrid, Box, Select, Input, useColorModeValue } from "@chakra-ui/react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MdDelete, MdEdit, MdSave } from 'react-icons/md';
 import TotalSpent from "views/admin/default/components/TotalSpent";
@@ -48,6 +48,8 @@ export default function UserReports() {
     3: <TotalSpent />,
     4: <WeeklyRevenue />
   });
+  const [columns, setColumns] = useState(2); // Default number of columns
+
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -207,6 +209,10 @@ export default function UserReports() {
     await saveComponentMapToServer([{ component_type: type }]);
   };
 
+  const handleColumnsChange = (event) => {
+    setColumns(parseInt(event.target.value));
+  };
+
   if (!user) {
     return <Login onLogin={() => setUser(getUser())} />;
   }
@@ -251,11 +257,23 @@ export default function UserReports() {
             {selectedOrder ? 'Delete Order' : 'Save Order'}
           </Button>
         </SimpleGrid>
+        <Flex mb='20px' alignItems='center' justifyContent='center'>
+          <Select
+            onChange={handleColumnsChange}
+            value={columns}
+            width="200px"
+          >
+            <option value={1}>1</option>
+            <option value={2}>2</option>
+            <option value={3}>3</option>
+            <option value={4}>4</option>
+          </Select>
+        </Flex>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId='droppable'>
           {(provided) => (
             <SimpleGrid
-              columns={{ base: 1, md: 2, xl: 2 }}
+              columns={{ base: 1, md: columns, xl: columns }}
               gap='20px'
               mb='20px'
               {...provided.droppableProps}
@@ -275,19 +293,16 @@ export default function UserReports() {
                   )}
                 </Draggable>
               ))}
-              <Box>
-                <NewComponentByUrl 
-                  backgroundColor={bgColor} 
-                  onAdd={handleAddComponentByUrl} 
-                  text={"Add Component by URL"}
-                />
-                
-              </Box>
               <NewComponent 
-                  backgroundColor={bgColor} 
-                  onAdd={handleAddComponent} 
-                  text={"Add Component"}
-                />
+                backgroundColor={bgColor} 
+                onAdd={handleAddComponent} 
+                text={"Add Component"}
+              />
+              <NewComponentByUrl 
+                backgroundColor={bgColor} 
+                onAdd={handleAddComponentByUrl} 
+                text={"Add Component by URL"}
+              />
               {provided.placeholder}
             </SimpleGrid>
           )}
