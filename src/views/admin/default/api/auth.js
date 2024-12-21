@@ -31,6 +31,15 @@ export const signOut = async () => {
 
 export const getUser = async () => {
   const { data, error } = await supabase.auth.getUser();
-  if (error) throw error;
-  return data.user;
+  try {
+    if (error) throw error;
+    return data.user;
+  } catch (error) {
+    if (error.message === 'Auth session missing!') {
+      console.error('Authentication session is missing. Please sign in again.');
+    } else {
+      console.error('An error occurred:', error);
+    }
+    return null;
+  }
 };
