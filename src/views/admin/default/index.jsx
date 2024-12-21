@@ -7,11 +7,12 @@ import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import TotalRevenue from "./components/TotalRevenue";
 import TotalCosts from "./components/TotalCosts";
 import { saveOrderToServer, loadOrderFromServer, deleteOrderFromServer, saveComponentMapToServer, loadComponentMapFromServer } from './api/sapi';
-import { getUser } from './api/auth';
-import Login from './components/Login';
+import { getUser, signIn } from './api/auth';
+import Cookies from "js-cookie";
 import NewComponent from "./components/NewComponent";
 import NewComponentByUrl from "./components/NewComponentByUrl";
 import TotalSomething from "./components/TotalSomething";
+import { useNavigate } from "react-router-dom";
 
 export default function UserReports() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -49,7 +50,26 @@ export default function UserReports() {
     4: <WeeklyRevenue />
   });
   const [columns, setColumns] = useState(2); // Default number of columns
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userCookie = Cookies.get('user');
+      if (userCookie) {
+        setUser(JSON.parse(userCookie));
+      } else {
+        const currentUser = await getUser();
+        if (!currentUser) {
+          navigate('/auth/sign-in');
+        } else {
+          setUser(currentUser);
+          Cookies.set('user', JSON.stringify(currentUser), { expires: 7 }); // Save user in cookie for 7 days
+        }
+      }
+    };
 
+    fetchUser();
+  }, [navigate]);
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -212,10 +232,6 @@ export default function UserReports() {
   const handleColumnsChange = (event) => {
     setColumns(parseInt(event.target.value));
   };
-
-  if (!user) {
-    return <Login onLogin={() => setUser(getUser())} />;
-  }
 
   return (
     <div>

@@ -62,6 +62,7 @@ export default function HeaderLinks(props) {
   const handleLogout = async () => {
     try {
       await signOut();
+      navigate('/auth/sign-in');
     } catch (error) {
       console.error('Error logging out: ', error);
     }

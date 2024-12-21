@@ -9,16 +9,40 @@ import {
   // extendTheme
 } from '@chakra-ui/react';
 import initialTheme from './theme/theme'; //  { themeGreen }
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Login from 'views/admin/default/components/Login';
+import { getUser } from 'views/admin/default/api/auth';
+import { signIn } from 'views/admin/default/api/auth';
 // Chakra imports
 
 export default function Main() {
   // eslint-disable-next-line
   const [currentTheme, setCurrentTheme] = useState(initialTheme);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const currentUser = await getUser();
+      setUser(currentUser);
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLogin = async (email, password) => {
+    try {
+      await signIn(email, password);
+      const currentUser = await getUser();
+      setUser(currentUser);
+    } catch (error) {
+      console.error('Error logging in:', error);
+    }
+  };
+
   return (
     <ChakraProvider theme={currentTheme}>
       <Routes>
-        <Route path="auth/*" element={<AuthLayout />} />
+        <Route path="auth/*" element={<Login onLogin={handleLogin}/>} />
         <Route
           path="admin/*"
           element={

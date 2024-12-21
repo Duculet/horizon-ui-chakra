@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { Button, Input, Flex, Box, Text } from '@chakra-ui/react';
+import { Button, Input, Flex, Box, Text, Alert, AlertIcon } from '@chakra-ui/react';
 import { signIn, signUp } from '../api/auth';
+import { useNavigate } from 'react-router-dom';
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleAuth = async () => {
     try {
       if (isSignUp) {
         await signUp(email, password);
       } else {
-        await signIn(email, password);
+        onLogin(email, password);
+        navigate('/admin/default');
       }
-      onLogin();
     } catch (err) {
       setError(err.message);
     }
@@ -25,7 +27,12 @@ const Login = ({ onLogin }) => {
     <Flex align="center" justify="center" height="100vh">
       <Box p={6} rounded="md" bg="white" boxShadow="lg">
         <Text fontSize="2xl" mb={4}>{isSignUp ? 'Sign Up' : 'Login'}</Text>
-        {error && <Text color="red.500" mb={4}>{error}</Text>}
+        {error && (
+          <Alert status="error" mb={4}>
+            <AlertIcon />
+            {error}
+          </Alert>
+        )}
         <Input
           placeholder="Email"
           value={email}
