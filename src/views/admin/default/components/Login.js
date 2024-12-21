@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Flex, Box, Text, Alert, AlertIcon } from '@chakra-ui/react';
+import { Flex, Box, Text, Input, Button, Alert, AlertIcon } from '@chakra-ui/react';
 import { signIn, signUp } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,14 +8,16 @@ const Login = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
   const navigate = useNavigate();
 
   const handleAuth = async () => {
     try {
       if (isSignUp) {
+        setAlertMessage('Sign up process has been started.');
         await signUp(email, password);
       } else {
-        onLogin(email, password);
+        await onLogin(email, password);
         navigate('/admin/default');
       }
     } catch (err) {
@@ -27,6 +29,12 @@ const Login = ({ onLogin }) => {
     <Flex align="center" justify="center" height="100vh">
       <Box p={6} rounded="md" bg="white" boxShadow="lg">
         <Text fontSize="2xl" mb={4}>{isSignUp ? 'Sign Up' : 'Login'}</Text>
+        {alertMessage && (
+          <Alert status="info" mb={4}>
+            <AlertIcon />
+            {alertMessage}
+          </Alert>
+        )}
         {error && (
           <Alert status="error" mb={4}>
             <AlertIcon />
@@ -46,14 +54,10 @@ const Login = ({ onLogin }) => {
           onChange={(e) => setPassword(e.target.value)}
           mb={4}
         />
-        <Button onClick={handleAuth} colorScheme="blue" width="full">
+        <Button onClick={handleAuth} colorScheme="blue" width="full" mb={4}>
           {isSignUp ? 'Sign Up' : 'Login'}
         </Button>
-        <Button
-          variant="link"
-          mt={4}
-          onClick={() => setIsSignUp(!isSignUp)}
-        >
+        <Button variant="link" onClick={() => setIsSignUp(!isSignUp)}>
           {isSignUp ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
         </Button>
       </Box>

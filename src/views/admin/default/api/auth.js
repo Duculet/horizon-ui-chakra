@@ -7,6 +7,7 @@ export const signUp = async (email, password) => {
     return data.user;
   } catch (e) {
     console.error('Error signing up: ', e);
+    throw e;
   }
 };
 
