@@ -87,7 +87,7 @@ export default function UserReports() {
     };
 
     checkUser();
-  }, [componentMap]);
+  }, []);
 
   const getComponentByTypeAndUrl = (url, type) => {
     switch (type) {

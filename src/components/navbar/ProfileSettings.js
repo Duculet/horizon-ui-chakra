@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Input, Flex, Box, Text } from '@chakra-ui/react';
-import { updateProfile } from 'firebase/auth';
-import { auth } from '../../views/admin/default/api/firebase';
+import { supabase } from '../../views/admin/default/api/supabase';
 
 const ProfileSettings = () => {
   const [displayName, setDisplayName] = useState('');
@@ -10,13 +9,31 @@ const ProfileSettings = () => {
 
   const handleUpdateProfile = async () => {
     try {
-      await updateProfile(auth.currentUser, {
-        displayName,
-        photoURL,
+      const user = supabase.auth.getUser();
+      if (!user) {
+        setMessage('No user is signed in.');
+        return;
+      }
+
+      const updates = {
+        id: user.id,
+        display_name: displayName,
+        photo_url: photoURL,
+        updated_at: new Date(),
+      };
+
+      const { error } = await supabase.from('profiles').upsert(updates, {
+        returning: 'minimal', // Don't return the value after inserting
       });
+
+      if (error) {
+        throw error;
+      }
+
       setMessage('Profile updated successfully!');
     } catch (error) {
-      setMessage(`Error updating profile: ${error.message}`);
+      console.error('Error updating profile:', error);
+      setMessage('Error updating profile.');
     }
   };
 

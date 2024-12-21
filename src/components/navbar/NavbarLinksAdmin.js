@@ -25,8 +25,7 @@ import navImage from 'assets/img/layout/Navbar.png';
 import { MdNotificationsNone, MdInfoOutline } from 'react-icons/md';
 import { IoMdMoon, IoMdSunny } from 'react-icons/io';
 import { FaEthereum } from 'react-icons/fa';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../views/admin/default/api/firebase';
+import { getUser, signOut } from '../../views/admin/default/api/auth';
 import routes from 'routes';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,28 +48,24 @@ export default function HeaderLinks(props) {
   const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
 
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const currentUser = await getUser();
+      setUser(currentUser);
+    };
+
+    fetchUser();
+  }, []);
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await signOut();
     } catch (error) {
       console.error('Error logging out: ', error);
     }
   };
-
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   const handleProfileSettings = () => {
     navigate('profile-settings');
