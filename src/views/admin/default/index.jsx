@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Flex, Button, Icon, SimpleGrid, Box, Select, Input, useColorModeValue } from "@chakra-ui/react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { MdDelete, MdEdit, MdSave } from 'react-icons/md';
+import { MdCalendarMonth, MdCalendarToday, MdDelete, MdEdit, MdSave } from 'react-icons/md';
 import TotalSpent from "views/admin/default/components/TotalSpent";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import TotalRevenue from "./components/TotalRevenue";
@@ -235,7 +235,30 @@ export default function UserReports() {
 
   return (
     <div>
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap='20px' width="100%" mt={{base: '120px', md: '80px'}} mb={'20px'}>
+        <Flex alignItems='center' mt={{base: '120px', md: '80px'}} mb='20px' gap='20px'>
+          <Button 
+            borderRadius="50%"
+            p='0'
+            width={"40px"}
+            onClick={() => setIsEditing(!isEditing)}
+            leftIcon={<Icon as={MdEdit} />}
+            iconSpacing={0}
+            className={isEditing ? 'jiggle' : ''} 
+          >
+          </Button>
+          <Select
+            placeholder="Select preset"
+            onChange={handleOrderChange}
+            value={selectedOrder ? selectedOrder : ''}
+            textAlign={"center"}
+            width={"150px"}
+          >
+            {savedOrders.map(order => (
+              <option key={order.name} value={order.name}>{order.name}</option>
+            ))}
+          </Select>
+        </Flex>
+        {isEditing && <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap='20px' width="100%" mt={{base: '120px', md: '80px'}} mb={'20px'}>
           <Button
             p={!isEditing ? '5px 30px' : '5px 50px'}
             onClick={() => setIsEditing(!isEditing)}
@@ -272,7 +295,7 @@ export default function UserReports() {
           >
             {selectedOrder ? 'Delete Order' : 'Save Order'}
           </Button>
-        </SimpleGrid>
+        </SimpleGrid>}
         <Flex mb='20px' alignItems='center' justifyContent='center'>
           <Select
             onChange={handleColumnsChange}

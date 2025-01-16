@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Flex, Box, Text, Input, Button, Alert, AlertIcon } from '@chakra-ui/react';
-import { signIn, signUp } from '../api/auth';
+import { signIn, signInWithOAuth, signUp } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 
 const Login = ({ onLogin }) => {
@@ -25,10 +25,41 @@ const Login = ({ onLogin }) => {
     }
   };
 
+  const handleGoogleAuth = async () => {
+    try {
+      const { error } = await signInWithOAuth('google');
+      if (error) {
+        throw error;
+      }
+      navigate('/admin/default');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
-    <Flex align="center" justify="center" height="100vh">
-      <Box p={6} rounded="md" bg="white" boxShadow="lg">
-        <Text fontSize="2xl" mb={4}>{isSignUp ? 'Sign Up' : 'Login'}</Text>
+    <Flex align="center" justify="center" height="100vh" bg="white">
+      <Box
+        p={6}
+        rounded="md"
+        bg="white"
+        boxShadow="lg"
+        width={'100%'}
+        height={'100%'}
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+      >
+        <Box
+          width="100%"
+          maxWidth="400px"
+          margin="0 auto"
+          padding="20px"
+          borderRadius="10px"
+          boxShadow="lg"
+          bg="white"
+        >
+          <Text fontSize="2xl" mb={4}>{isSignUp ? 'Sign Up' : 'Login'}</Text>
         {alertMessage && (
           <Alert status="info" mb={4}>
             <AlertIcon />
@@ -60,6 +91,10 @@ const Login = ({ onLogin }) => {
         <Button variant="link" onClick={() => setIsSignUp(!isSignUp)}>
           {isSignUp ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
         </Button>
+        <Button onClick={handleGoogleAuth} colorScheme="red" width="full">
+          Sign in with Google
+        </Button>
+        </Box>
       </Box>
     </Flex>
   );

@@ -32,7 +32,7 @@ const routes = [
     name: 'Profle Settings',
     layout: '/admin',
     path: '/profile-settings',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
     component: <ProfileSettings />,
   },
   {

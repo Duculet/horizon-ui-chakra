@@ -21,6 +21,17 @@ export const signIn = async (email, password) => {
   }
 };
 
+export const signInWithOAuth = async (provider) => {
+  try {
+  const { data, error } = await supabase.auth.signInWithOAuth({ provider });
+  if (error) throw error;
+  return { data, error };
+} catch (error) {
+  console.error('An error occurred during OAuth sign-in:', error);
+  return { data: null, error };
+}
+};
+
 export const signOut = async () => {
   try {
     const { error } = await supabase.auth.signOut();
