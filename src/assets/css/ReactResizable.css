@@ -1,0 +1,76 @@
+.react-resizable {
+    position: relative;
+}
+
+.react-resizable-handle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    box-sizing: border-box;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBpZD0iZXVoT01RMlZnZVQxIiB2aWV3Qm94PSIwIDAgNzIgNzIiIHNoYXBlLXJlbmRlcmluZz0iZ2VvbWV0cmljUHJlY2lzaW9uIiB0ZXh0LXJlbmRlcmluZz0iZ2VvbWV0cmljUHJlY2lzaW9uIj48ZWxsaXBzZSByeD0iMTQuNzE1OTcyIiByeT0iMTQuNzE1OTcyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNS4xNjA5NSA1Ni44NCkiIGZpbGw9IiM2Mzk1ZjgiIHN0cm9rZS13aWR0aD0iMCIvPjxlbGxpcHNlIHJ4PSIxNC43MTU5NzIiIHJ5PSIxNC43MTU5NzIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDU2LjgzOTA1MSA1Ni44NCkiIGZpbGw9IiM2Mzk1ZjgiIHN0cm9rZS13aWR0aD0iMCIvPjxlbGxpcHNlIHJ4PSIxNC43MTU5NzIiIHJ5PSIxNC43MTU5NzIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDU2LjgzOTA1MSAxNS4xNikiIGZpbGw9IiM2Mzk1ZjgiIHN0cm9rZS13aWR0aD0iMCIvPjxyZWN0IHdpZHRoPSI0MS42NzgxMDEiIGhlaWdodD0iMjkuNDMxOTQ0IiByeD0iMCIgcnk9IjAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE1LjE2MDk1IDQyLjEyNDAyOCkiIGZpbGw9IiM2Mzk1ZjgiIHN0cm9rZS13aWR0aD0iMCIvPjxyZWN0IHdpZHRoPSIyOS40MyIgaGVpZ2h0PSI0MS42OCIgcng9IjAiIHJ5PSIwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0Mi4xMjUwMjMgMTUuMTYpIiBmaWxsPSIjNjM5NWY4IiBzdHJva2Utd2lkdGg9IjAiLz48L3N2Zz4=');
+    background-position: bottom right;
+    padding: 0 3px 3px 0;
+}
+
+.react-resizable-handle-sw {
+    bottom: 0;
+    left: 0;
+    cursor: sw-resize;
+    transform: rotate(90deg);
+}
+
+.react-resizable-handle-se {
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+}
+
+.react-resizable-handle-nw {
+    top: 0;
+    left: 0;
+    cursor: nw-resize;
+    transform: rotate(180deg);
+}
+
+.react-resizable-handle-ne {
+    top: 0;
+    right: 0;
+    cursor: ne-resize;
+    transform: rotate(270deg);
+}
+
+.react-resizable-handle-w,
+.react-resizable-handle-e {
+    top: 50%;
+    margin-top: -10px;
+    cursor: ew-resize;
+}
+
+.react-resizable-handle-w {
+    left: 0;
+    transform: rotate(135deg);
+}
+
+.react-resizable-handle-e {
+    right: 0;
+    transform: rotate(315deg);
+}
+
+.react-resizable-handle-n,
+.react-resizable-handle-s {
+    left: 50%;
+    margin-left: -10px;
+    cursor: ns-resize;
+}
+
+.react-resizable-handle-n {
+    top: 0;
+    transform: rotate(225deg);
+}
+
+.react-resizable-handle-s {
+    bottom: 0;
+    transform: rotate(45deg);
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Flex, Button, Icon, SimpleGrid, Box, Select, Input, useColorModeValue } from "@chakra-ui/react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MdCalendarMonth, MdCalendarToday, MdDelete, MdEdit, MdSave } from 'react-icons/md';
@@ -13,6 +13,8 @@ import NewComponent from "./components/NewComponent";
 import NewComponentByUrl from "./components/NewComponentByUrl";
 import TotalSomething from "./components/TotalSomething";
 import { useNavigate } from "react-router-dom";
+import { Resizable } from 'react-resizable';
+import '../../../assets/css/ReactResizable.css';
 
 export default function UserReports() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -37,9 +39,9 @@ export default function UserReports() {
     }
   ]);
   const [savedOrders, setSavedOrders] = useState([{
-      name: 'Default Order',
-      order: [1, 2, 3, 4]
-    }]);
+    name: 'Default Order',
+    order: [1, 2, 3, 4]
+  }]);
   const [newOrderName, setNewOrderName] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [user, setUser] = useState(null);
@@ -51,6 +53,33 @@ export default function UserReports() {
   });
   const [columns, setColumns] = useState(2); // Default number of columns
   const navigate = useNavigate();
+
+  const contentRef = useRef(null);
+  const [dimensions, setDimensions] = useState({});
+
+  const onResize = (id, event, { size }) => {
+    setDimensions(prevDimensions => ({
+      ...prevDimensions,
+      [id]: { width: size.width, height: size.height }
+    }));
+  };
+
+  useEffect(() => {
+    components.forEach(component => {
+      if (!dimensions[component.id]) {
+        const contentRef = document.getElementById(`content-${component.id}`);
+        if (contentRef) {
+          setDimensions(prevDimensions => ({
+            ...prevDimensions,
+            [component.id]: {
+              width: contentRef.offsetWidth,
+              height: contentRef.offsetHeight
+            }
+          }));
+        }
+      }
+    });
+  }, [components]);
   
   useEffect(() => {
     const fetchUser = async () => {
@@ -311,27 +340,45 @@ export default function UserReports() {
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId='droppable'>
           {(provided) => (
-            <SimpleGrid
-              columns={{ base: 1, md: columns, xl: columns }}
+            <Flex
+              wrap='wrap'
               gap='20px'
               mb='20px'
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {components.map((component, index) => (
-                <Draggable key={component.id} draggableId={component.id} index={index} isDragDisabled={!isEditing}>
-                  {(provided, snapshot) => (
-                    <Box
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      // className={isEditing && !snapshot.isDragging ? 'jiggle' : ''} // add jiggle class for fun
-                    >
-                      {component.content}
-                    </Box>
-                  )}
-                </Draggable>
-              ))}
+              {components.map((component, index) => {
+                const { width = 200, height = 200 } = dimensions[component.id] || {};
+
+                return (
+                  <Draggable key={component.id} draggableId={component.id} index={index} isDragDisabled={!isEditing}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...(isEditing ? {} : provided.draggableProps)}
+                        {...(isEditing ? {} : provided.dragHandleProps)}
+                        style={{ display: 'flex', flexDirection: 'column' }} // Flex container
+                      >
+                        <Resizable
+                          width={width}
+                          height={height}
+                          onResize={(e, data) => onResize(component.id, e, data)}
+                          minConstraints={[100, 100]}
+                          maxConstraints={[500, 500]}
+                          resizeHandles={['se']}
+                          draggableOpts={{ disabled: !isEditing }}
+                        >
+                          <div id={`content-${component.id}`} style={{ width: `${width}px`, height: `${height}px`, display: 'flex', flexDirection: 'column' }}>
+                            <Box style={{ flex: 1 }}>
+                              {component.content}
+                            </Box>
+                          </div>
+                        </Resizable>
+                      </div>
+                    )}
+                  </Draggable>
+                );
+              })}
               <NewComponent 
                 backgroundColor={bgColor} 
                 onAdd={handleAddComponent} 
@@ -342,8 +389,7 @@ export default function UserReports() {
                 onAdd={handleAddComponentByUrl} 
                 text={"Add Component by URL"}
               />
-              {provided.placeholder}
-            </SimpleGrid>
+            </Flex>
           )}
         </Droppable>
       </DragDropContext>
