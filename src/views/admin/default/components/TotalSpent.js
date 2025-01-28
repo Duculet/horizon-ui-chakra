@@ -137,6 +137,7 @@ export default function TotalSpent(props) {
       align='center'
       direction='column'
       w='100%'
+      h='100%'
       mb='0px'
       {...rest}>
       <Flex justify='space-between' ps='0px' pe='20px' pt='5px'>

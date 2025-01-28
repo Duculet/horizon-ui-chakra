@@ -19,7 +19,7 @@ export default function Default(props) {
   const textColorSecondary = "secondaryGray.600";
 
   return (
-    <Card py='15px'>
+    <Card py='15px' h='100%'>
       <Flex
         my='auto'
         h='100%'

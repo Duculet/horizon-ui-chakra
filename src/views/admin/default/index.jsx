@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Flex, Button, Icon, SimpleGrid, Box, Select, Input, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Button, Icon, Grid, SimpleGrid, Box, Select, Input, useColorModeValue } from "@chakra-ui/react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MdCalendarMonth, MdCalendarToday, MdDelete, MdEdit, MdSave } from 'react-icons/md';
 import TotalSpent from "views/admin/default/components/TotalSpent";
@@ -13,6 +13,8 @@ import NewComponent from "./components/NewComponent";
 import NewComponentByUrl from "./components/NewComponentByUrl";
 import TotalSomething from "./components/TotalSomething";
 import { useNavigate } from "react-router-dom";
+import { Resizable } from 'react-resizable';
+import { motion } from 'framer-motion';
 
 export default function UserReports() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -22,18 +24,22 @@ export default function UserReports() {
     {
       id: '1',
       content: <TotalRevenue />,
+      size: 'small'
     },
     {
       id: '2',
       content: <TotalCosts />,
+      size: 'small'
     },
     {
       id: '3',
       content: <TotalSpent />,
+      size: 'large'
     },
     {
       id: '4',
       content: <WeeklyRevenue />,
+      size: 'large'
     }
   ]);
   const [savedOrders, setSavedOrders] = useState([{
@@ -51,6 +57,11 @@ export default function UserReports() {
   });
   const [columns, setColumns] = useState(2); // Default number of columns
   const navigate = useNavigate();
+  const sizeMap = {
+    small: { width: 1, height: 300 },
+    medium: { width: 1, height: 300 },
+    large: { width: 2, height: 600 }
+  };
   
   useEffect(() => {
     const fetchUser = async () => {
@@ -168,7 +179,10 @@ export default function UserReports() {
 
     const newOrder = {
       name: newOrderName,
-      ids: components.map(component => component.id)
+      components: components.map(c => ({
+        id: c.id,
+        size: c.size
+      }))
     };
 
     console.log(newOrder);
@@ -212,11 +226,25 @@ export default function UserReports() {
     await saveComponentMapToServer([{ component_type: type }]);
   };
 
+  const handleResize = (componentId, size) => {
+    setComponents(prevComponents =>
+      prevComponents.map(comp => 
+        comp.id === componentId 
+          ? { ...comp, width: size.width, height: size.height } 
+          : comp
+      )
+    );
+  };
+
   const handleAddComponent = async (type) => {
     const componentMapFromServer = await loadComponentMapFromServer();
     const newId = (componentMapFromServer.length + 1).toString();
     const newComponent = getComponentByType(type);
-    const updatedComponents = [...components, { id: newId, content: newComponent }];
+    const updatedComponents = [...components, { 
+      id: newId, 
+      content: newComponent,
+      size: 'small'
+    }];
     setComponents(updatedComponents);
 
     // Update the component map with the new component
@@ -231,6 +259,16 @@ export default function UserReports() {
 
   const handleColumnsChange = (event) => {
     setColumns(parseInt(event.target.value));
+  };
+
+  const handleSizeChange = (componentId, newSize) => {
+    setComponents(prevComponents =>
+      prevComponents.map(comp => 
+        comp.id === componentId 
+          ? { ...comp, size: newSize }
+          : comp
+      )
+    );
   };
 
   return (
@@ -296,41 +334,81 @@ export default function UserReports() {
             {selectedOrder ? 'Delete Order' : 'Save Order'}
           </Button>
         </SimpleGrid>}
-        <Flex mb='20px' alignItems='center' justifyContent='center'>
-          <Select
-            onChange={handleColumnsChange}
-            value={columns}
-            width="200px"
-          >
-            <option value={1}>1</option>
-            <option value={2}>2</option>
-            <option value={3}>3</option>
-            <option value={4}>4</option>
-          </Select>
-        </Flex>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId='droppable'>
           {(provided) => (
-            <SimpleGrid
-              columns={{ base: 1, md: columns, xl: columns }}
-              gap='20px'
-              mb='20px'
+            <Grid
+              templateColumns="repeat(auto-fill, minmax(300px, 1fr))"
+              autoFlow="dense"
+              gap="20px"
+              mb="20px"
               {...provided.droppableProps}
               ref={provided.innerRef}
+              as={motion.div}
+              layout="position"
+              transition={{
+                type: "spring",
+                stiffness: 350,
+                damping: 25,
+                mass: 0.5
+              }}
             >
               {components.map((component, index) => (
                 <Draggable key={component.id} draggableId={component.id} index={index} isDragDisabled={!isEditing}>
-                  {(provided, snapshot) => (
-                    <Box
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      // className={isEditing && !snapshot.isDragging ? 'jiggle' : ''} // add jiggle class for fun
-                    >
-                      {component.content}
-                    </Box>
-                  )}
-                </Draggable>
+                {(provided) => (
+                  <Box
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    position="relative"
+                    w={`100%`}
+                    h={`${sizeMap[component.size].height}px`}
+                    minH="300px"
+                    gridColumn={`span ${component.size === 'small' ? 1 : component.size === 'medium' ? 2 : 2}`}
+                    gridRow={`span ${component.size === 'small' ? 1 : component.size === 'large' ? 2 : 1}`}
+                    transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                    as={motion.div}
+                    initial={false}
+                    animate={{
+                      height: sizeMap[component.size].height,
+                      gridColumn: `span ${component.size === 'small' ? 1 : component.size === 'medium' ? 2 : 2}`,
+                      gridRow: `span ${component.size === 'small' ? 1 : component.size === 'large' ? 2 : 1}`
+                    }}
+                    sx={{
+                      '&': {
+                        transition: 'height 0.3s ease, transform 0.3s ease width 0.3s ease',
+                        willChange: 'height, transform width',
+                      },
+                    }}
+                  >
+                    {component.content}
+                    
+                    {isEditing && (
+                      <Flex
+                        position="absolute"
+                        bottom="10px"
+                        right="10px"
+                        gap="5px"
+                        zIndex="1"
+                      >
+                        {['small', 'medium', 'large'].map((size) => (
+                          <Button
+                            key={size}
+                            size="xs"
+                            colorScheme={component.size === size ? 'blue' : 'gray'}
+                            onClick={() => handleSizeChange(component.id, size)}
+                            _hover={{ transform: 'scale(1.05)' }}
+                            _active={{ transform: 'scale(0.95)' }}
+                            transition="transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                          >
+                            {size.charAt(0).toUpperCase()}
+                          </Button>
+                        ))}
+                      </Flex>
+                    )}
+                  </Box>
+                )}
+              </Draggable>
               ))}
               <NewComponent 
                 backgroundColor={bgColor} 
@@ -343,7 +421,7 @@ export default function UserReports() {
                 text={"Add Component by URL"}
               />
               {provided.placeholder}
-            </SimpleGrid>
+            </Grid>
           )}
         </Droppable>
       </DragDropContext>

@@ -39,7 +39,7 @@ export default function WeeklyRevenue(props) {
     { bg: "whiteAlpha.100" }
   );
   return (
-    <Card align='center' direction='column' w='100%' {...rest}>
+    <Card align='center' direction='column' w='100%' h='100%' {...rest}>
       <Flex align='center' w='100%' px='15px' py='10px'>
         <Text
           me='auto'
