@@ -6,7 +6,8 @@ export const saveOrderToServer = async (order) => {
       .from('orders')
       .upsert({
         name: order.name,  // Ensure 'name' exists
-        ids: order.ids     // Ensure 'ids' exists
+        ids: order.ids,     // Ensure 'ids' exists
+        sizes: order.sizes, // Ensure 'sizes' exists
       }, { onConflict: ['name'] });
 
     if (error) throw error;

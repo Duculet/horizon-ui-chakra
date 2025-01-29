@@ -58,9 +58,9 @@ export default function UserReports() {
   const [columns, setColumns] = useState(2); // Default number of columns
   const navigate = useNavigate();
   const sizeMap = {
-    small: { width: 1, height: 300 },
-    medium: { width: 1, height: 300 },
-    large: { width: 2, height: 600 }
+    small: { width: 1, height: 150 },
+    medium: { width: 2, height: 250 },
+    large: { width: 2, height: 350 }
   };
   
   useEffect(() => {
@@ -87,20 +87,18 @@ export default function UserReports() {
       const savedOrdersFromServer = await loadOrderFromServer();
       const componentMapFromServer = await loadComponentMapFromServer();
 
-      // console.log(componentMapFromServer)
-      // console.log(savedOrdersFromServer)
-
       if (savedOrdersFromServer) {
         setSavedOrders(savedOrdersFromServer);
         const defaultOrder = savedOrdersFromServer.find(order => order.name === 'Default Order');
         if (defaultOrder) {
-          setComponents(defaultOrder.order.map(id => ({
-            id,
-            content: componentMap[id]
+          setComponents(defaultOrder.components.map(c => ({
+            id: c.id,
+            content: componentMap[c.id],
+            size: c.size // Apply the saved size
           })));
         }
       }
-      
+
       if (componentMapFromServer) {
         const map = {};
         componentMapFromServer.forEach(c => {
@@ -155,18 +153,19 @@ export default function UserReports() {
   };
 
   const handleOrderChange = (event) => {
-    const order = event.target.value;
-    setSelectedOrder(order);
+    const orderName = event.target.value;
+    setSelectedOrder(orderName);
 
-    // Find the selected order by name
-    const selectedOrder = savedOrders.find(o => o.name === order);
-    console.log(selectedOrder);
+    const selectedOrder = savedOrders.find(o => o.name === orderName);
+
+    console.log(selectedOrder)
 
     if (selectedOrder) {
       // Map over the 'ids' array and get the components
       const newOrder = selectedOrder.ids.map(id => ({
         id,
-        content: componentMap[id]
+        content: componentMap[id],
+        size: selectedOrder.sizes[selectedOrder.ids.indexOf(id)] // Apply the saved size
       }));
 
       // Set the components in the state
@@ -179,10 +178,8 @@ export default function UserReports() {
 
     const newOrder = {
       name: newOrderName,
-      components: components.map(c => ({
-        id: c.id,
-        size: c.size
-      }))
+      ids: components.map(c => c.id),
+      sizes: components.map(c => c.size),
     };
 
     console.log(newOrder);
@@ -216,13 +213,11 @@ export default function UserReports() {
     console.log(newComponent);
     console.log(newId);
 
-    // Update the component map with the new component
     setComponentMap(prevMap => ({
       ...prevMap,
       [newId]: newComponent
     }));
 
-    // Save the new component to the server
     await saveComponentMapToServer([{ component_type: type }]);
   };
 
@@ -247,13 +242,11 @@ export default function UserReports() {
     }];
     setComponents(updatedComponents);
 
-    // Update the component map with the new component
     setComponentMap(prevMap => ({
       ...prevMap,
       [newId]: newComponent
     }));
 
-    // Save the new component to the server
     await saveComponentMapToServer([{ component_type: type }]);
   };
 
@@ -296,7 +289,7 @@ export default function UserReports() {
             ))}
           </Select>
         </Flex>
-        {isEditing && <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap='20px' width="100%" mt={{base: '120px', md: '80px'}} mb={'20px'}>
+        {isEditing && <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap='20px' width="100%" mb={'20px'}>
           <Button
             p={!isEditing ? '5px 30px' : '5px 50px'}
             onClick={() => setIsEditing(!isEditing)}
@@ -338,7 +331,7 @@ export default function UserReports() {
         <Droppable droppableId='droppable'>
           {(provided) => (
             <Grid
-              templateColumns="repeat(auto-fill, minmax(300px, 1fr))"
+              templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
               autoFlow="dense"
               gap="20px"
               mb="20px"
@@ -361,23 +354,29 @@ export default function UserReports() {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     position="relative"
-                    w={`100%`}
+                    w={`${sizeMap[component.size].width * 300}px`}
                     h={`${sizeMap[component.size].height}px`}
-                    minH="300px"
+                    minH="100px"
                     gridColumn={`span ${component.size === 'small' ? 1 : component.size === 'medium' ? 2 : 2}`}
                     gridRow={`span ${component.size === 'small' ? 1 : component.size === 'large' ? 2 : 1}`}
-                    transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-                    as={motion.div}
+                    as={motion.div} // Use Framer Motion for animations
                     initial={false}
                     animate={{
-                      height: sizeMap[component.size].height,
-                      gridColumn: `span ${component.size === 'small' ? 1 : component.size === 'medium' ? 2 : 2}`,
-                      gridRow: `span ${component.size === 'small' ? 1 : component.size === 'large' ? 2 : 1}`
+                      height: sizeMap[component.size].height, // Animate height
+                      width: `100%`, // Animate width
+                      gridColumn: `span ${component.size === 'small' ? 1 : component.size === 'medium' ? 2 : 2}`, // Animate grid column span
+                      gridRow: `span ${component.size === 'small' ? 1 : component.size === 'large' ? 2 : 1}`, // Animate grid row span
+                    }}
+                    transition={{
+                      type: "spring", // Use spring physics for smooth animations
+                      stiffness: 300, // Adjust stiffness for responsiveness
+                      damping: 25, // Adjust damping to reduce oscillation
+                      mass: 0.5, // Adjust mass for weightiness
                     }}
                     sx={{
                       '&': {
-                        transition: 'height 0.3s ease, transform 0.3s ease width 0.3s ease',
-                        willChange: 'height, transform width',
+                        transition: 'height 0.3s ease, width 0.3s ease, transform 0.3s ease', // Smooth CSS transitions
+                        willChange: 'height, width, transform', // Optimize for performance
                       },
                     }}
                   >

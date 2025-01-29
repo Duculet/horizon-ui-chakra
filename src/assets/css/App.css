@@ -118,12 +118,13 @@ option {
 
 /* Add to your global CSS */
 .grid-item {
-  transition: grid-column 0.3s ease, grid-row 0.3s ease, height 0.3s ease;
+  transition: grid-column 0.3s ease, grid-row 0.3s ease, height 0.3s ease, width 0.3s ease;
 }
 
 /* Ensure the grid container transitions smoothly */
 .grid-container {
   transition: grid-template-rows 0.3s ease;
+  transition: grid-template-columns 0.3s ease;
 }
 
 .react-resizable-handle {
