@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Grid,
   Flex,
   Button,
   Icon,
-  Grid,
   SimpleGrid,
   Box,
   Select,
@@ -35,7 +35,6 @@ import NewComponent from './components/NewComponent';
 import NewComponentByUrl from './components/NewComponentByUrl';
 import TotalSomething from './components/TotalSomething';
 import { useNavigate } from 'react-router-dom';
-import { Resizable } from 'react-resizable';
 import { motion } from 'framer-motion';
 
 export default function UserReports() {
@@ -298,6 +297,12 @@ export default function UserReports() {
     );
   };
 
+  const handleDeleteComponent = (componentId) => {
+    setComponents((prevComponents) =>
+      prevComponents.filter((comp) => comp.id !== componentId),
+    );
+  };
+
   return (
     <div>
       <Flex
@@ -380,7 +385,7 @@ export default function UserReports() {
         <Droppable droppableId="droppable">
           {(provided) => (
             <Grid
-              templateColumns="repeat(auto-fit, minmax(300px, 1fr))" // Dynamically adjust column sizes
+              templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
               autoFlow="dense"
               gap="20px"
               mb="20px"
@@ -414,43 +419,43 @@ export default function UserReports() {
                           : component.size === 'medium'
                           ? 2
                           : 2
-                      }`} // Handle grid column span
+                      }`}
                       gridRow={`span ${
                         component.size === 'small'
                           ? 1
                           : component.size === 'large'
                           ? 2
                           : 1
-                      }`} // Handle grid row span
-                      as={motion.div} // Use Framer Motion for animations
+                      }`}
+                      as={motion.div}
                       initial={false}
                       animate={{
-                        height: sizeMap[component.size].height, // Animate height
+                        height: sizeMap[component.size].height,
                         gridColumn: `span ${
                           component.size === 'small'
                             ? 1
                             : component.size === 'medium'
                             ? 2
                             : 2
-                        }`, // Animate grid column span
+                        }`,
                         gridRow: `span ${
                           component.size === 'small'
                             ? 1
                             : component.size === 'large'
                             ? 2
                             : 1
-                        }`, // Animate grid row span
+                        }`,
                       }}
                       transition={{
-                        type: 'spring', // Use spring physics for smooth animations
-                        stiffness: 300, // Adjust stiffness for responsiveness
-                        damping: 25, // Adjust damping to reduce oscillation
-                        mass: 0.5, // Adjust mass for weightiness
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 25,
+                        mass: 0.5,
                       }}
                       sx={{
                         '&': {
-                          transition: 'height 0.3s ease, transform 0.3s ease', // Smooth CSS transitions
-                          willChange: 'height, transform', // Optimize for performance
+                          transition: 'height 0.3s ease, transform 0.3s ease',
+                          willChange: 'height, transform',
                         },
                       }}
                     >
@@ -481,6 +486,16 @@ export default function UserReports() {
                               {size.charAt(0).toUpperCase()}
                             </Button>
                           ))}
+                          <Button
+                            size="xs"
+                            colorScheme="red"
+                            onClick={() => handleDeleteComponent(component.id)}
+                            _hover={{ transform: 'scale(1.05)' }}
+                            _active={{ transform: 'scale(0.95)' }}
+                            transition="transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                          >
+                            Delete
+                          </Button>
                         </Flex>
                       )}
                     </Box>
