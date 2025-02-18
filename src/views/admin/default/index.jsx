@@ -1,51 +1,75 @@
-import React, { useState, useEffect } from "react";
-import { Flex, Button, Icon, Grid, SimpleGrid, Box, Select, Input, useColorModeValue } from "@chakra-ui/react";
+import React, { useState, useEffect } from 'react';
+import {
+  Flex,
+  Button,
+  Icon,
+  Grid,
+  SimpleGrid,
+  Box,
+  Select,
+  Input,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { MdCalendarMonth, MdCalendarToday, MdDelete, MdEdit, MdSave } from 'react-icons/md';
-import TotalSpent from "views/admin/default/components/TotalSpent";
-import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
-import TotalRevenue from "./components/TotalRevenue";
-import TotalCosts from "./components/TotalCosts";
-import { saveOrderToServer, loadOrderFromServer, deleteOrderFromServer, saveComponentMapToServer, loadComponentMapFromServer } from './api/sapi';
+import {
+  MdCalendarMonth,
+  MdCalendarToday,
+  MdDelete,
+  MdEdit,
+  MdSave,
+} from 'react-icons/md';
+import TotalSpent from 'views/admin/default/components/TotalSpent';
+import WeeklyRevenue from 'views/admin/default/components/WeeklyRevenue';
+import TotalRevenue from './components/TotalRevenue';
+import TotalCosts from './components/TotalCosts';
+import {
+  saveOrderToServer,
+  loadOrderFromServer,
+  deleteOrderFromServer,
+  saveComponentMapToServer,
+  loadComponentMapFromServer,
+} from './api/sapi';
 import { getUser, signIn } from './api/auth';
-import Cookies from "js-cookie";
-import NewComponent from "./components/NewComponent";
-import NewComponentByUrl from "./components/NewComponentByUrl";
-import TotalSomething from "./components/TotalSomething";
-import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
+import NewComponent from './components/NewComponent';
+import NewComponentByUrl from './components/NewComponentByUrl';
+import TotalSomething from './components/TotalSomething';
+import { useNavigate } from 'react-router-dom';
 import { Resizable } from 'react-resizable';
 import { motion } from 'framer-motion';
 
 export default function UserReports() {
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-  const bgColor = useColorModeValue("white", "navy.800");
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const bgColor = useColorModeValue('white', 'navy.800');
   const [isEditing, setIsEditing] = useState(false);
   const [components, setComponents] = useState([
     {
       id: '1',
       content: <TotalRevenue />,
-      size: 'small'
+      size: 'small',
     },
     {
       id: '2',
       content: <TotalCosts />,
-      size: 'small'
+      size: 'small',
     },
     {
       id: '3',
       content: <TotalSpent />,
-      size: 'large'
+      size: 'large',
     },
     {
       id: '4',
       content: <WeeklyRevenue />,
-      size: 'large'
-    }
+      size: 'large',
+    },
   ]);
-  const [savedOrders, setSavedOrders] = useState([{
+  const [savedOrders, setSavedOrders] = useState([
+    {
       name: 'Default Order',
-      order: [1, 2, 3, 4]
-    }]);
+      order: [1, 2, 3, 4],
+    },
+  ]);
   const [newOrderName, setNewOrderName] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [user, setUser] = useState(null);
@@ -53,16 +77,16 @@ export default function UserReports() {
     1: <TotalRevenue />,
     2: <TotalCosts />,
     3: <TotalSpent />,
-    4: <WeeklyRevenue />
+    4: <WeeklyRevenue />,
   });
   const [columns, setColumns] = useState(2); // Default number of columns
   const navigate = useNavigate();
   const sizeMap = {
     small: { width: 1, height: 150 },
     medium: { width: 2, height: 250 },
-    large: { width: 2, height: 350 }
+    large: { width: 2, height: 350 },
   };
-  
+
   useEffect(() => {
     const fetchUser = async () => {
       const userCookie = Cookies.get('user');
@@ -89,19 +113,23 @@ export default function UserReports() {
 
       if (savedOrdersFromServer) {
         setSavedOrders(savedOrdersFromServer);
-        const defaultOrder = savedOrdersFromServer.find(order => order.name === 'Default Order');
+        const defaultOrder = savedOrdersFromServer.find(
+          (order) => order.name === 'Default Order',
+        );
         if (defaultOrder) {
-          setComponents(defaultOrder.components.map(c => ({
-            id: c.id,
-            content: componentMap[c.id],
-            size: c.size // Apply the saved size
-          })));
+          setComponents(
+            defaultOrder.components.map((c) => ({
+              id: c.id,
+              content: componentMap[c.id],
+              size: c.size, // Apply the saved size
+            })),
+          );
         }
       }
 
       if (componentMapFromServer) {
         const map = {};
-        componentMapFromServer.forEach(c => {
+        componentMapFromServer.forEach((c) => {
           map[c.id] = getComponentByType(c.component_type);
         });
         setComponentMap(map);
@@ -156,16 +184,16 @@ export default function UserReports() {
     const orderName = event.target.value;
     setSelectedOrder(orderName);
 
-    const selectedOrder = savedOrders.find(o => o.name === orderName);
+    const selectedOrder = savedOrders.find((o) => o.name === orderName);
 
-    console.log(selectedOrder)
+    console.log(selectedOrder);
 
     if (selectedOrder) {
       // Map over the 'ids' array and get the components
-      const newOrder = selectedOrder.ids.map(id => ({
+      const newOrder = selectedOrder.ids.map((id) => ({
         id,
         content: componentMap[id],
-        size: selectedOrder.sizes[selectedOrder.ids.indexOf(id)] // Apply the saved size
+        size: selectedOrder.sizes[selectedOrder.ids.indexOf(id)], // Apply the saved size
       }));
 
       // Set the components in the state
@@ -178,8 +206,8 @@ export default function UserReports() {
 
     const newOrder = {
       name: newOrderName,
-      ids: components.map(c => c.id),
-      sizes: components.map(c => c.size),
+      ids: components.map((c) => c.id),
+      sizes: components.map((c) => c.size),
     };
 
     console.log(newOrder);
@@ -196,7 +224,9 @@ export default function UserReports() {
   const handleDeleteOrder = async () => {
     if (!selectedOrder) return;
 
-    const updatedOrders = savedOrders.filter(order => order.name !== selectedOrder);
+    const updatedOrders = savedOrders.filter(
+      (order) => order.name !== selectedOrder,
+    );
     setSavedOrders(updatedOrders);
     setSelectedOrder(null);
 
@@ -207,27 +237,30 @@ export default function UserReports() {
     const componentMapFromServer = await loadComponentMapFromServer();
     const newId = (componentMapFromServer.length + 1).toString();
     const newComponent = getComponentByTypeAndUrl(url, type);
-    const updatedComponents = [...components, { id: newId, content: newComponent }];
+    const updatedComponents = [
+      ...components,
+      { id: newId, content: newComponent },
+    ];
     setComponents(updatedComponents);
 
     console.log(newComponent);
     console.log(newId);
 
-    setComponentMap(prevMap => ({
+    setComponentMap((prevMap) => ({
       ...prevMap,
-      [newId]: newComponent
+      [newId]: newComponent,
     }));
 
     await saveComponentMapToServer([{ component_type: type }]);
   };
 
   const handleResize = (componentId, size) => {
-    setComponents(prevComponents =>
-      prevComponents.map(comp => 
-        comp.id === componentId 
-          ? { ...comp, width: size.width, height: size.height } 
-          : comp
-      )
+    setComponents((prevComponents) =>
+      prevComponents.map((comp) =>
+        comp.id === componentId
+          ? { ...comp, width: size.width, height: size.height }
+          : comp,
+      ),
     );
   };
 
@@ -235,16 +268,19 @@ export default function UserReports() {
     const componentMapFromServer = await loadComponentMapFromServer();
     const newId = (componentMapFromServer.length + 1).toString();
     const newComponent = getComponentByType(type);
-    const updatedComponents = [...components, { 
-      id: newId, 
-      content: newComponent,
-      size: 'small'
-    }];
+    const updatedComponents = [
+      ...components,
+      {
+        id: newId,
+        content: newComponent,
+        size: 'small',
+      },
+    ];
     setComponents(updatedComponents);
 
-    setComponentMap(prevMap => ({
+    setComponentMap((prevMap) => ({
       ...prevMap,
-      [newId]: newComponent
+      [newId]: newComponent,
     }));
 
     await saveComponentMapToServer([{ component_type: type }]);
@@ -255,41 +291,51 @@ export default function UserReports() {
   };
 
   const handleSizeChange = (componentId, newSize) => {
-    setComponents(prevComponents =>
-      prevComponents.map(comp => 
-        comp.id === componentId 
-          ? { ...comp, size: newSize }
-          : comp
-      )
+    setComponents((prevComponents) =>
+      prevComponents.map((comp) =>
+        comp.id === componentId ? { ...comp, size: newSize } : comp,
+      ),
     );
   };
 
   return (
     <div>
-        <Flex alignItems='center' mt={{base: '120px', md: '80px'}} mb='20px' gap='20px'>
-          <Button 
-            borderRadius="50%"
-            p='0'
-            width={"40px"}
-            onClick={() => setIsEditing(!isEditing)}
-            leftIcon={<Icon as={MdEdit} />}
-            iconSpacing={0}
-            className={isEditing ? 'jiggle' : ''} 
-          >
-          </Button>
-          <Select
-            placeholder="Select preset"
-            onChange={handleOrderChange}
-            value={selectedOrder ? selectedOrder : ''}
-            textAlign={"center"}
-            width={"150px"}
-          >
-            {savedOrders.map(order => (
-              <option key={order.name} value={order.name}>{order.name}</option>
-            ))}
-          </Select>
-        </Flex>
-        {isEditing && <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap='20px' width="100%" mb={'20px'}>
+      <Flex
+        alignItems="center"
+        mt={{ base: '120px', md: '80px' }}
+        mb="20px"
+        gap="20px"
+      >
+        <Button
+          borderRadius="50%"
+          p="0"
+          width={'40px'}
+          onClick={() => setIsEditing(!isEditing)}
+          leftIcon={<Icon as={MdEdit} />}
+          iconSpacing={0}
+          className={isEditing ? 'jiggle' : ''}
+        ></Button>
+        <Select
+          placeholder="Select preset"
+          onChange={handleOrderChange}
+          value={selectedOrder ? selectedOrder : ''}
+          textAlign={'center'}
+          width={'150px'}
+        >
+          {savedOrders.map((order) => (
+            <option key={order.name} value={order.name}>
+              {order.name}
+            </option>
+          ))}
+        </Select>
+      </Flex>
+      {isEditing && (
+        <SimpleGrid
+          columns={{ base: 1, md: 2, lg: 4 }}
+          gap="20px"
+          width="100%"
+          mb={'20px'}
+        >
           <Button
             p={!isEditing ? '5px 30px' : '5px 50px'}
             onClick={() => setIsEditing(!isEditing)}
@@ -301,10 +347,12 @@ export default function UserReports() {
             placeholder="Select preset"
             onChange={handleOrderChange}
             value={selectedOrder ? selectedOrder : ''}
-            textAlign={"center"}
+            textAlign={'center'}
           >
-            {savedOrders.map(order => (
-              <option key={order.name} value={order.name}>{order.name}</option>
+            {savedOrders.map((order) => (
+              <option key={order.name} value={order.name}>
+                {order.name}
+              </option>
             ))}
           </Select>
           <Input
@@ -315,23 +363,24 @@ export default function UserReports() {
               setNewOrderName(e.target.value);
               setSelectedOrder(null);
             }}
-            textAlign={"center"}
+            textAlign={'center'}
           />
           <Button
-            height={"40px"}
-            p='5px 50px'
+            height={'40px'}
+            p="5px 50px"
             isDisabled={!isEditing}
             onClick={selectedOrder ? handleDeleteOrder : handleSaveOrder}
             leftIcon={<Icon as={selectedOrder ? MdDelete : MdSave} />}
           >
             {selectedOrder ? 'Delete Order' : 'Save Order'}
           </Button>
-        </SimpleGrid>}
+        </SimpleGrid>
+      )}
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId='droppable'>
+        <Droppable droppableId="droppable">
           {(provided) => (
             <Grid
-              templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+              templateColumns="repeat(auto-fit, minmax(300px, 1fr))" // Dynamically adjust column sizes
               autoFlow="dense"
               gap="20px"
               mb="20px"
@@ -340,85 +389,104 @@ export default function UserReports() {
               as={motion.div}
               layout="position"
               transition={{
-                type: "spring",
+                type: 'spring',
                 stiffness: 350,
                 damping: 25,
-                mass: 0.5
+                mass: 0.5,
               }}
             >
               {components.map((component, index) => (
-                <Draggable key={component.id} draggableId={component.id} index={index} isDragDisabled={!isEditing}>
-                {(provided) => (
-                  <Box
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    position="relative"
-                    w={`${sizeMap[component.size].width * 300}px`}
-                    h={`${sizeMap[component.size].height}px`}
-                    minH="100px"
-                    gridColumn={`span ${component.size === 'small' ? 1 : component.size === 'medium' ? 2 : 2}`}
-                    gridRow={`span ${component.size === 'small' ? 1 : component.size === 'large' ? 2 : 1}`}
-                    as={motion.div} // Use Framer Motion for animations
-                    initial={false}
-                    animate={{
-                      height: sizeMap[component.size].height, // Animate height
-                      width: `100%`, // Animate width
-                      gridColumn: `span ${component.size === 'small' ? 1 : component.size === 'medium' ? 2 : 2}`, // Animate grid column span
-                      gridRow: `span ${component.size === 'small' ? 1 : component.size === 'large' ? 2 : 1}`, // Animate grid row span
-                    }}
-                    transition={{
-                      type: "spring", // Use spring physics for smooth animations
-                      stiffness: 300, // Adjust stiffness for responsiveness
-                      damping: 25, // Adjust damping to reduce oscillation
-                      mass: 0.5, // Adjust mass for weightiness
-                    }}
-                    sx={{
-                      '&': {
-                        transition: 'height 0.3s ease, width 0.3s ease, transform 0.3s ease', // Smooth CSS transitions
-                        willChange: 'height, width, transform', // Optimize for performance
-                      },
-                    }}
-                  >
-                    {component.content}
-                    
-                    {isEditing && (
-                      <Flex
-                        position="absolute"
-                        bottom="10px"
-                        right="10px"
-                        gap="5px"
-                        zIndex="1"
-                      >
-                        {['small', 'medium', 'large'].map((size) => (
-                          <Button
-                            key={size}
-                            size="xs"
-                            colorScheme={component.size === size ? 'blue' : 'gray'}
-                            onClick={() => handleSizeChange(component.id, size)}
-                            _hover={{ transform: 'scale(1.05)' }}
-                            _active={{ transform: 'scale(0.95)' }}
-                            transition="transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-                          >
-                            {size.charAt(0).toUpperCase()}
-                          </Button>
-                        ))}
-                      </Flex>
-                    )}
-                  </Box>
-                )}
-              </Draggable>
+                <Draggable
+                  key={component.id}
+                  draggableId={component.id}
+                  index={index}
+                  isDragDisabled={!isEditing}
+                >
+                  {(provided) => (
+                    <Box
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      position="relative"
+                      gridColumn={`span ${
+                        component.size === 'small'
+                          ? 1
+                          : component.size === 'medium'
+                          ? 2
+                          : 2
+                      }`} // Handle grid column span
+                      gridRow={`span ${
+                        component.size === 'small'
+                          ? 1
+                          : component.size === 'large'
+                          ? 2
+                          : 1
+                      }`} // Handle grid row span
+                      as={motion.div} // Use Framer Motion for animations
+                      initial={false}
+                      animate={{
+                        height: sizeMap[component.size].height, // Animate height
+                        gridColumn: `span ${
+                          component.size === 'small'
+                            ? 1
+                            : component.size === 'medium'
+                            ? 2
+                            : 2
+                        }`, // Animate grid column span
+                        gridRow: `span ${
+                          component.size === 'small'
+                            ? 1
+                            : component.size === 'large'
+                            ? 2
+                            : 1
+                        }`, // Animate grid row span
+                      }}
+                      transition={{
+                        type: 'spring', // Use spring physics for smooth animations
+                        stiffness: 300, // Adjust stiffness for responsiveness
+                        damping: 25, // Adjust damping to reduce oscillation
+                        mass: 0.5, // Adjust mass for weightiness
+                      }}
+                      sx={{
+                        '&': {
+                          transition: 'height 0.3s ease, transform 0.3s ease', // Smooth CSS transitions
+                          willChange: 'height, transform', // Optimize for performance
+                        },
+                      }}
+                    >
+                      {component.content}
+
+                      {isEditing && (
+                        <Flex
+                          position="absolute"
+                          bottom="10px"
+                          right="10px"
+                          gap="5px"
+                          zIndex="1"
+                        >
+                          {['small', 'medium', 'large'].map((size) => (
+                            <Button
+                              key={size}
+                              size="xs"
+                              colorScheme={
+                                component.size === size ? 'blue' : 'gray'
+                              }
+                              onClick={() =>
+                                handleSizeChange(component.id, size)
+                              }
+                              _hover={{ transform: 'scale(1.05)' }}
+                              _active={{ transform: 'scale(0.95)' }}
+                              transition="transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                            >
+                              {size.charAt(0).toUpperCase()}
+                            </Button>
+                          ))}
+                        </Flex>
+                      )}
+                    </Box>
+                  )}
+                </Draggable>
               ))}
-              <NewComponent 
-                backgroundColor={bgColor} 
-                onAdd={handleAddComponent} 
-                text={"Add Component"}
-              />
-              <NewComponentByUrl 
-                backgroundColor={bgColor} 
-                onAdd={handleAddComponentByUrl} 
-                text={"Add Component by URL"}
-              />
               {provided.placeholder}
             </Grid>
           )}
