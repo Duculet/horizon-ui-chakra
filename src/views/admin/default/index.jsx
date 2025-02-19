@@ -333,54 +333,31 @@ export default function UserReports() {
             </option>
           ))}
         </Select>
+        {isEditing && (
+          <>
+            <Input
+              placeholder="New preset name"
+              color={textColor}
+              value={newOrderName}
+              width={'200px'}
+              onChange={(e) => {
+                setNewOrderName(e.target.value);
+                setSelectedOrder(null);
+              }}
+              textAlign={'center'}
+            />
+            <Button
+              height={'40px'}
+              p="5px 50px"
+              isDisabled={!isEditing}
+              onClick={selectedOrder ? handleDeleteOrder : handleSaveOrder}
+              leftIcon={<Icon as={selectedOrder ? MdDelete : MdSave} />}
+            >
+              {selectedOrder ? 'Delete Order' : 'Save Order'}
+            </Button>
+          </>
+        )}
       </Flex>
-      {isEditing && (
-        <SimpleGrid
-          columns={{ base: 1, md: 2, lg: 4 }}
-          gap="20px"
-          width="100%"
-          mb={'20px'}
-        >
-          <Button
-            p={!isEditing ? '5px 30px' : '5px 50px'}
-            onClick={() => setIsEditing(!isEditing)}
-            leftIcon={<Icon as={MdEdit} />}
-          >
-            {isEditing ? 'Stop Editing' : 'Edit'}
-          </Button>
-          <Select
-            placeholder="Select preset"
-            onChange={handleOrderChange}
-            value={selectedOrder ? selectedOrder : ''}
-            textAlign={'center'}
-          >
-            {savedOrders.map((order) => (
-              <option key={order.name} value={order.name}>
-                {order.name}
-              </option>
-            ))}
-          </Select>
-          <Input
-            placeholder="New preset name"
-            color={textColor}
-            value={newOrderName}
-            onChange={(e) => {
-              setNewOrderName(e.target.value);
-              setSelectedOrder(null);
-            }}
-            textAlign={'center'}
-          />
-          <Button
-            height={'40px'}
-            p="5px 50px"
-            isDisabled={!isEditing}
-            onClick={selectedOrder ? handleDeleteOrder : handleSaveOrder}
-            leftIcon={<Icon as={selectedOrder ? MdDelete : MdSave} />}
-          >
-            {selectedOrder ? 'Delete Order' : 'Save Order'}
-          </Button>
-        </SimpleGrid>
-      )}
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="droppable">
           {(provided) => (
