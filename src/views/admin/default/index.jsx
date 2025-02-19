@@ -303,6 +303,8 @@ export default function UserReports() {
     );
   };
 
+  const isAdmin = user && user.email.includes('admin');
+
   return (
     <div>
       <Flex
@@ -311,15 +313,17 @@ export default function UserReports() {
         mb="20px"
         gap="20px"
       >
-        <Button
-          borderRadius="50%"
-          p="0"
-          width={'40px'}
-          onClick={() => setIsEditing(!isEditing)}
-          leftIcon={<Icon as={MdEdit} />}
-          iconSpacing={0}
-          className={isEditing ? 'jiggle' : ''}
-        ></Button>
+        {isAdmin && (
+          <Button
+            borderRadius="50%"
+            p="0"
+            width={'40px'}
+            onClick={() => setIsEditing(!isEditing)}
+            leftIcon={<Icon as={MdEdit} />}
+            iconSpacing={0}
+            className={isEditing ? 'jiggle' : ''}
+          ></Button>
+        )}
         <Select
           placeholder="Select preset"
           onChange={handleOrderChange}
@@ -333,7 +337,7 @@ export default function UserReports() {
             </option>
           ))}
         </Select>
-        {isEditing && (
+        {isAdmin && isEditing && (
           <>
             <Input
               placeholder="New preset name"
@@ -348,7 +352,7 @@ export default function UserReports() {
             />
             <Button
               height={'40px'}
-              p="5px 50px"
+              p="5px 15px"
               isDisabled={!isEditing}
               onClick={selectedOrder ? handleDeleteOrder : handleSaveOrder}
               leftIcon={<Icon as={selectedOrder ? MdDelete : MdSave} />}
@@ -438,7 +442,7 @@ export default function UserReports() {
                     >
                       {component.content}
 
-                      {isEditing && (
+                      {isAdmin && isEditing && (
                         <Flex
                           position="absolute"
                           bottom="10px"
@@ -471,7 +475,7 @@ export default function UserReports() {
                             _active={{ transform: 'scale(0.95)' }}
                             transition="transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
                           >
-                            -
+                            Delete
                           </Button>
                         </Flex>
                       )}
