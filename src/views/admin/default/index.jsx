@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Grid,
   Flex,
@@ -22,6 +23,7 @@ import TotalSpent from 'views/admin/default/components/TotalSpent';
 import WeeklyRevenue from 'views/admin/default/components/WeeklyRevenue';
 import TotalRevenue from './components/TotalRevenue';
 import TotalCosts from './components/TotalCosts';
+import PieCardNou from './components/PieCardNou';
 import {
   saveOrderToServer,
   loadOrderFromServer,
@@ -36,33 +38,12 @@ import NewComponentByUrl from './components/NewComponentByUrl';
 import TotalSomething from './components/TotalSomething';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { fetchLeadsFromSalesforce } from 'variables/fetchfromsalesforce';
 
 export default function UserReports() {
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const bgColor = useColorModeValue('white', 'navy.800');
   const [isEditing, setIsEditing] = useState(false);
-  const [components, setComponents] = useState([
-    {
-      id: '1',
-      content: <TotalRevenue />,
-      size: 'small',
-    },
-    {
-      id: '2',
-      content: <TotalCosts />,
-      size: 'small',
-    },
-    {
-      id: '3',
-      content: <TotalSpent />,
-      size: 'large',
-    },
-    {
-      id: '4',
-      content: <WeeklyRevenue />,
-      size: 'large',
-    },
-  ]);
   const [savedOrders, setSavedOrders] = useState([
     {
       name: 'Default Order',
@@ -104,6 +85,130 @@ export default function UserReports() {
 
     fetchUser();
   }, [navigate]);
+
+  const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [authData, setAuthData] = useState(null);
+  const [pieChartData, setPieChartData] = useState([]);
+
+  const fetchAuthToken = async () => {
+    try {
+      const response = await axios.get(
+        'https://salesforce-leads-viewer.onrender.com/api/auth',
+      );
+      setAuthData(response.data);
+      return response.data;
+    } catch (err) {
+      setError('Failed to authenticate with Salesforce');
+      setLoading(false);
+      return null;
+    }
+  };
+
+  const fetchLeads = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Get auth token if we don't have one
+      const auth = authData || (await fetchAuthToken());
+      if (!auth) return;
+
+      const response = await axios.get(
+        'https://salesforce-leads-viewer.onrender.com/api/leads',
+        {
+          params: {
+            access_token: auth.access_token,
+            instance_url: auth.instance_url,
+          },
+        },
+      );
+
+      setLeads(response.data.records);
+      setLoading(false);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to fetch leads');
+      setLoading(false);
+    }
+  };
+
+  // Process leads to calculate pie chart data
+  const processPieChartData = (leads) => {
+    const groupedData = leads.reduce((acc, lead) => {
+      const status = lead.Status || 'Unknown'; // Group by 'Status' field
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+
+    console.log(groupedData);
+    const chartData = ['working', 'New', 'Open - Not Contacted'].map(
+      (status) => {
+        return groupedData[status] || 0;
+      },
+    );
+    console.log(chartData);
+
+    // Convert grouped data to pie chart format, namely
+    // [25, 69, 12] for [New, Contacted, Unqualified]
+    setPieChartData(chartData);
+  };
+
+  useEffect(() => {
+    fetchLeads();
+  }, []);
+
+  useEffect(() => {
+    if (leads.length > 0) {
+      processPieChartData(leads);
+    }
+  }, [leads]);
+
+  const [components, setComponents] = useState([
+    {
+      id: '1',
+      content: <TotalRevenue />,
+      size: 'small',
+    },
+    {
+      id: '2',
+      content: <TotalCosts />,
+      size: 'small',
+    },
+    {
+      id: '3',
+      content: <TotalSpent />,
+      size: 'large',
+    },
+    {
+      id: '4',
+      content: <WeeklyRevenue />,
+      size: 'large',
+    },
+  ]);
+
+  useEffect(() => {
+    setComponents((prevComponents) => {
+      // Remove existing PieCardNou component if it exists
+      const filteredComponents = prevComponents.filter(
+        (comp) => comp.id !== '5',
+      );
+
+      // Add PieCardNou only if pieChartData is not empty
+      if (pieChartData.length > 0) {
+        return [
+          ...filteredComponents,
+          {
+            id: '5',
+            content: <PieCardNou pieChartData={pieChartData} />,
+            size: 'large',
+          },
+        ];
+      }
+
+      return filteredComponents;
+    });
+  }, [pieChartData]);
 
   useEffect(() => {
     const loadInitialData = async () => {

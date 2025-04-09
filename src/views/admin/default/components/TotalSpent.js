@@ -24,7 +24,7 @@ import {
 } from "variables/charts";
 
 export default function TotalSpent(props) {
-  const { ...rest } = props;
+  const { scale, ...rest } = props;
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedOption, setSelectedOption] = useState('All Time');
